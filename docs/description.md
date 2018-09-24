@@ -23,6 +23,7 @@ visualize(): plot maze map with path if exist.
 ```
 
 **usage:**
+
 build and print 10 same-size mazes
 ```
 
@@ -45,6 +46,6 @@ if m.path:
 ```
 
 ## solution
-a number of algorithms to solove the maze, including Deep First Search, Breadth First Search, A* and their variants.
+a number of algorithms to solve the maze, including Deep First Search, Breadth First Search, A* and their variants.
 
 ### DFS()
