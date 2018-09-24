@@ -10,7 +10,7 @@ int rows in [2 : inf]:
 int cols in [2 : inf]:
 float p in [0 : 1]:
 np.array cell with ndim = 2:
-list path with element (row, col): a path from S to G. None if not exist
+list path with element (row, col): a path from S to G. None or [] if not exist
 (row, col) start: start point, default (0, 0)
 (row, col) goal: destination, default (rows-1, cols-1)
 bool isBuilt: True: has built up walls, do NOT build it again; False: empty maze, call function build() before solove it
