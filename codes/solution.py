@@ -31,39 +31,47 @@ def expand(m, temp, closed):
 	return tempFringe
 
 def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, checkFringe = False):
+	#INPUT args:
 	#class maze m: maze to be solved
 	#bool IDDFS: True: Iterative Deepening Depth First Search, promise optimal; False: DFS, much faster
 	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe, promise optimal; False: return as soon as goal, usually faster 
 	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe, in this case, DFS, effective and WITHOUT ANY COST; False: return when pop goal out from fringe
 	#bool randomWalk: True: randomly pick a neighbor as next block, might work well with randomPosition; False: priority: R > D > L > U, seems effective in this diagonal maze
 	#bool checkFringe: True: besides closed set, keep fringe distinct, to some extent, return a shorter path, but NOT DEFINITELY SHORTEST; False: just keep no back turning, a little bit faster
+	#RETURN VALUE:
+	#int blockCount in [1, inf]: the number of blocks have opend
 	def DFSCore(m, keepSearch = False, quickGoal = False, randomWalk = False, checkFringe = False):
 		#see DFS
 		path = []
 		fringe = []
-		closed = np.zeros_like(m.cell, dtype = np.uint8)
+		closed = np.zeros_like(m.cell, dtype = np.uint16) #memory cost, but compatible with checkFringe #TODO: what if size > 250
+		blockCount = 0
 	
 		fringe.append(m.start)
 	
 		while fringe:
+			#po
 			temp = fringe.pop()
+			#modify path to temp block
 			if temp == 'pop':
 				path.pop()
 				continue
 			else:
 				path.append(temp)
 				closed[temp] = len(path)
-			
-			if temp == m.goal:
-				return path
-	
+			#expand block
+			blockCount = blockCount + 1
+			if temp == m.goal: #done
+				m.path = path
+				return blockCount
 			tempFringe = expand(m, temp, closed)
-	
+			#push into fringe
 			if tempFringe:
 				for nextTemp in tempFringe:
 					fringe.extend(['pop', nextTemp])
-	
-		return None
+		#failed, no path
+		m.path = None
+		return blockCount
 
 	if IDDFS:
 		#TODO: IDDFS
@@ -76,4 +84,4 @@ if __name__ == '__main__':
 	M = buildUp()
 	M.visualize()
 	path = DFS(M)
-	print(path)
+	print(M.path)
