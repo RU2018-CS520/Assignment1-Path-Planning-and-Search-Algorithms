@@ -28,7 +28,7 @@ class maze(object):
 
 		if self.isBuilt:
 			if force:
-				self.cell = np.zeros_like(self.cell)
+				self.cell = np.zeros_like(self.cell, dtype = np.uint8)
 			else:
 				print('W: maze.build(), duplicate build')
 				return
