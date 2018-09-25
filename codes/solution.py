@@ -1,6 +1,7 @@
 import frame
 import numpy as np
 import random
+import itertools
 
 def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False):
 	##int rows in [2 : inf]: maze width and height
@@ -58,13 +59,19 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
-	def DFSCore(m, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
-		#see DFS
+	def DFSCore(m, depthLimit = 0, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
+		#INPUT ARGS:
+		#int depthLimit in [1 : inf]: used in IDDFS to limit depth each iteration explores, 0 if not IDDFS
+		#OUTPUT ARGS: 
+		#int maxDepth in [1 : inf]: max depth of searched blocks
+		#others see DFS
 		tempPath = []
 		fringe = []
 		closed = np.zeros_like(m.cell, dtype = np.uint16) #memory cost, but compatible with checkFringe #TODO: what if size > 250
 		blockCount = 0
 		goalPath = []
+		maxDepth = 0
+		tempDepth = 0
 	
 		fringe.extend(['pop',m.start])
 	
@@ -78,19 +85,25 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 				if checkFringe and closed[temp] != 0 and closed[temp] < len(tempPath) + 1:
 					continue
 				tempPath.append(temp)
-			#expand block
+				tempDepth = len(tempPath)
+				if tempDepth > maxDepth:
+					maxDepth = tempDepth
+			#process block
 			blockCount = blockCount + 1
 			if temp == m.goal: #done
-				if keepSearch and goalPath and len(goalPath) <= len(tempPath): #keepSearch and path already exist and shorter
+				if keepSearch and goalPath and len(goalPath) <= tempDepth: #keepSearch and path already exist and shorter
 					continue
 				#not keepSearch => first avilible path, or it have already returned; no path exist or longer path => update path
 				goalPath = tempPath.copy() #hard copy
 				if keepSearch:
 					continue
-				return (blockCount, goalPath)
+				return (blockCount, goalPath, maxDepth)
 			else:
-				closed[temp] = len(tempPath)
-			tempFringe = expand(m, temp, closed, randomWalk = randomWalk and not randomWalkPlus, updatable = keepSearch or checkFringe, tempPath = len(tempPath))
+				closed[temp] = tempDepth
+			#expand block
+			if depthLimit and tempDepth >= depthLimit:
+				continue
+			tempFringe = expand(m, temp, closed, randomWalk = randomWalk and not randomWalkPlus, updatable = keepSearch or checkFringe, tempPath = tempDepth)
 			#push into fringe
 			if tempFringe:
 				if randomWalkPlus:
@@ -99,25 +112,34 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 					if quickGoal and nextTemp == m.goal:
 						blockCount = blockCount + 1
 						tempPath.append(m.goal)
+						if tempDepth > maxDepth:
+							maxDepth = tempDepth
 						goalPath = tempPath.copy() #hard copy
-						return (blockCount, goalPath)
+						return (blockCount, goalPath, maxDepth)
 					if checkFringe:
-						if closed[nextTemp] == 0 or closed[nextTemp] > len(tempPath) + 1:
-							closed[nextTemp] = len(tempPath) + 1
+						if closed[nextTemp] == 0 or closed[nextTemp] > tempDepth + 1:
+							closed[nextTemp] = tempDepth + 1
 						else:
 							continue
 					fringe.extend(['pop', nextTemp])
 		#failed, no path
-		return (blockCount, goalPath)
+		return (blockCount, goalPath, maxDepth)
 	#check input
+	if IDDFS and keepSearch:
+		print('W: DFS(), contradictory input args IDDFS and KEEPSEARCH')
+		keepSearch = False
 	if keepSearch and quickGoal:
 		print('W: DFS(), contradictory input args KEEPSEARCH and QUICKGOAL')
-		keepSearch = False
+		keepSearch = checkFringe
 		quickGoal = False
 	#core
 	if IDDFS:
-		#TODO: IDDFS
-		pass
+		totalCount = 0
+		for depthLimit in itertools.count(1):
+			count, path, maxDepth = DFSCore(m, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
+			totalCount = totalCount + count
+			if path or maxDepth < depthLimit:
+				return (totalCount, path, maxDepth)
 	else:
 		return DFSCore(m, keepSearch = keepSearch, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
 
@@ -125,7 +147,8 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 if __name__ == '__main__':
 	M = buildUp(size = 25, p = 0.2)
 	M.visualize()
-	count, path = DFS(M, keepSearch = True, checkFringe = True, randomWalkPlus = True)
+	count, path, maxDepth = DFS(M, IDDFS = True, checkFringe = True, randomWalkPlus = True)
 	print(count)
 	print(path)
 	print(len(path))
+	print(maxDepth)
