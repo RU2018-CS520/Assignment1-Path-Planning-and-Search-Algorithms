@@ -1,7 +1,8 @@
 import frame
 import numpy as np
+import random
 
-def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
+def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False):
 	##int rows in [2 : inf]: maze width and height
 	#float p in [0 : 1]: probablity of a cell becomes a wall
 	#function initFunction: init walls, None default trivalInit()
@@ -11,77 +12,120 @@ def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	return m
 
 
-def expand(m, temp, closed):
+def expand(m, temp, closed, randomWalk = True, updatable = False, tempPath = -1):
+	#INPUT ARGS:
 	#class maze m: maze to be solved
 	#(row, col) temp: temp processing block
 	#np.array closed with ndim = 2: path length of each block in the maze, 0 if unexplored
+	#bool randomWalk: True: partially randomly pick a neighbor as next block, priority R and D > L and U, might works well; False: priority: strictly R > D > L > U, seems effective in this diagonal maze
+	#bool updatable: True: enable closed set to update, force True if keepSearch or checkFringe; False: closed blocks will never open again, save a huge amount of time
+	#int tempPath in [1 : inf]: length of tempPath, used to update fringe, use -1 if n/a
+	#RETURN VALUE:
+	#list tempFinge with element (row, col): accessible blocks
 	row = temp[0]
 	col = temp[1]
 	#check if neighbor block is accessible
-	tempFringe = []
+	tempFringeUL = []
+	tempFringeDR = []
 	#DO NOT CHANGE THE ORDER. r and d is prior than l and u in this diagonal maze
-	if row != 0 and m.cell[row-1, col] != 1 and closed[row-1, col] == 0:
-		tempFringe.append((row-1, col)) #U
-	if col != 0 and m.cell[row, col-1] != 1 and closed[row, col-1] == 0:
-		tempFringe.append((row, col-1)) #L
-	if row != m.rows-1 and m.cell[row+1, col] != 1 and closed[row+1, col] == 0:
-		tempFringe.append((row+1, col)) #D
-	if col != m.cols-1 and m.cell[row, col+1] != 1 and closed[row, col+1] == 0:
-		tempFringe.append((row, col+1)) #R
-	return tempFringe
+	if row != 0 and m.cell[row-1, col] != 1: #legal check
+		if closed[row-1, col] == 0 or (updatable and closed[row-1, col] > tempPath): #unexplored or updatable
+			tempFringeUL.append((row-1, col)) #U
+	if col != 0 and m.cell[row, col-1] != 1: #legal check
+		if closed[row, col-1] == 0 or (updatable and closed[row, col-1] > tempPath): #unexplored or updatable
+			tempFringeUL.append((row, col-1)) #L
+	if row != m.rows-1 and m.cell[row+1, col] != 1: #legal check
+		if closed[row+1, col] == 0 or (updatable and closed[row+1, col] > tempPath): #unexplored or updatable
+			tempFringeDR.append((row+1, col)) #D
+	if col != m.cols-1 and m.cell[row, col+1] != 1: #legal check
+		if closed[row, col+1] == 0 or (updatable and closed[row, col+1] > tempPath): #unexplored or updatable
+			tempFringeDR.append((row, col+1)) #R
+	#respectively shuffle
+	if randomWalk:
+		random.shuffle(tempFringeUL)
+		random.shuffle(tempFringeDR)
+	return tempFringeUL + tempFringeDR
 
-def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, checkFringe = False):
-	#INPUT args:
+def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
+	#INPUT ARGS:
 	#class maze m: maze to be solved
 	#bool IDDFS: True: Iterative Deepening Depth First Search, promise optimal; False: DFS, much faster
-	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe, promise optimal; False: return as soon as goal, usually faster 
+	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe, promise optimal if expand(updatable), works well with checkFringe; False: return as soon as goal, usually faster 
 	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe, in this case, DFS, effective and WITHOUT ANY COST; False: return when pop goal out from fringe
-	#bool randomWalk: True: randomly pick a neighbor as next block, might work well with randomPosition; False: priority: R > D > L > U, seems effective in this diagonal maze
+	#bool randomWalk: True: partially randomly pick a neighbor as next block, priority R and D > L and U, might works well; False: priority: strictly R > D > L > U, seems effective in this diagonal maze
+	#bool randomWalkPlus: True: force randomWalk = True, totally random, no priority, may be effictive when randomPosition; False: depend on randomWalk
 	#bool checkFringe: True: besides closed set, keep fringe distinct, to some extent, return a shorter path, but NOT DEFINITELY SHORTEST; False: just keep no back turning, a little bit faster
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
-	def DFSCore(m, keepSearch = False, quickGoal = False, randomWalk = False, checkFringe = False):
+	#list goalPath with element (row, col): a path from S to G. [] if not exist
+	def DFSCore(m, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
 		#see DFS
-		path = []
+		tempPath = []
 		fringe = []
 		closed = np.zeros_like(m.cell, dtype = np.uint16) #memory cost, but compatible with checkFringe #TODO: what if size > 250
 		blockCount = 0
+		goalPath = []
 	
-		fringe.append(m.start)
+		fringe.extend(['pop',m.start])
 	
 		while fringe:
-			#po
 			temp = fringe.pop()
 			#modify path to temp block
 			if temp == 'pop':
-				path.pop()
+				tempPath.pop()
 				continue
 			else:
-				path.append(temp)
-				closed[temp] = len(path)
+				if checkFringe and closed[temp] != 0 and closed[temp] < len(tempPath) + 1:
+					continue
+				tempPath.append(temp)
 			#expand block
 			blockCount = blockCount + 1
 			if temp == m.goal: #done
-				m.path = path
-				return blockCount
-			tempFringe = expand(m, temp, closed)
+				if keepSearch and goalPath and len(goalPath) <= len(tempPath): #keepSearch and path already exist and shorter
+					continue
+				#not keepSearch => first avilible path, or it have already returned; no path exist or longer path => update path
+				goalPath = tempPath.copy() #hard copy
+				if keepSearch:
+					continue
+				return (blockCount, goalPath)
+			else:
+				closed[temp] = len(tempPath)
+			tempFringe = expand(m, temp, closed, randomWalk = randomWalk and not randomWalkPlus, updatable = keepSearch or checkFringe, tempPath = len(tempPath))
 			#push into fringe
 			if tempFringe:
+				if randomWalkPlus:
+					random.shuffle(tempFringe)
 				for nextTemp in tempFringe:
+					if quickGoal and nextTemp == m.goal:
+						blockCount = blockCount + 1
+						tempPath.append(m.goal)
+						goalPath = tempPath.copy() #hard copy
+						return (blockCount, goalPath)
+					if checkFringe:
+						if closed[nextTemp] == 0 or closed[nextTemp] > len(tempPath) + 1:
+							closed[nextTemp] = len(tempPath) + 1
+						else:
+							continue
 					fringe.extend(['pop', nextTemp])
 		#failed, no path
-		m.path = None
-		return blockCount
-
+		return (blockCount, goalPath)
+	#check input
+	if keepSearch and quickGoal:
+		print('W: DFS(), contradictory input args KEEPSEARCH and QUICKGOAL')
+		keepSearch = False
+		quickGoal = False
+	#core
 	if IDDFS:
 		#TODO: IDDFS
 		pass
 	else:
-		return DFSCore(m, keepSearch = False, quickGoal = False, randomWalk = False, checkFringe = False)
+		return DFSCore(m, keepSearch = keepSearch, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
 
 
 if __name__ == '__main__':
-	M = buildUp()
+	M = buildUp(size = 25, p = 0.2)
 	M.visualize()
-	path = DFS(M)
-	print(M.path)
+	count, path = DFS(M, keepSearch = True, checkFringe = True, randomWalkPlus = True)
+	print(count)
+	print(path)
+	print(len(path))
