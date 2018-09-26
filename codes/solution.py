@@ -98,6 +98,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 					continue
 				#not keepSearch => first avilible path, or it have already returned; no path exist or longer path => update path
 				goalPath = tempPath.copy() #hard copy
+				depthLimit = len(goalPath) - 1
 				if keepSearch:
 					continue
 				return (blockCount, goalPath, maxDepth)
@@ -245,9 +246,9 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 
 
 if __name__ == '__main__':
-	M = buildUp(size = 10, p = 0.25)
+	M = buildUp(size = 10, p = 0.23)
 	M.visualize()
-	count, path, maxDepth = BFS(M, checkFringe = False, quickGoal = True, BDBFS = True)
+	count, path, maxDepth = DFS(M, keepSearch = True)
 	print(count)
 	print(path)
 	print(len(path))
