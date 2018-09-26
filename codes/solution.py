@@ -142,7 +142,6 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		totalCount = 0
 		for depthLimit in itertools.count(1):
 			count, path, maxDepth = DFSCore(m, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
-			print(count)
 			totalCount = totalCount + count
 			if path or maxDepth < depthLimit:
 				return (totalCount, path, maxDepth)
@@ -174,11 +173,11 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 	sPath = []
 	sFringe = []
 	sClosed = np.zeros_like(m.cell, dtype = np.uint32)
-	sPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint32)
+	sPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
 	gPath = []
 	gFringe = []
 	gClosed = np.zeros_like(m.cell, dtype = np.uint32)
-	gPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint32)
+	gPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
 	blockCount = 0
 	maxDepth = 0
 	#init fringe
