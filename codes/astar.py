@@ -32,6 +32,13 @@ def manhattanDist(u, v):
     x2 = v[0]
     y2 = v[1]
     return abs(x1 - x2) + abs(y1 - y2)
+
+def chebyshevDist(u, v):
+    x1 = u[0]
+    y1 = u[1]
+    x2 = v[0]
+    y2 = v[1]
+    return max(abs(x1 - x2), abs(y1 - y2))
  
 def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	#int rows in [2 : inf]: maze width and height
@@ -42,7 +49,7 @@ def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	m.build()
 	return m
 
-def aStar(m, distType = 1):
+def aStar(m, distFunction = manhattanDist):
     #INPUT ARGS:
 	#class maze m: maze to be solved
     #int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
@@ -87,10 +94,7 @@ def aStar(m, distType = 1):
             if closed[nx][ny] == 1:
                 continue
             closed[nx][ny] = 1
-            if distType == 1:
-                cost = euclideanDist(nextPos, m.goal) + current[0]
-            else:
-                cost = manhattanDist(nextPos, m.goal) + current[0]
+            cost = distFunction(nextPos, m.goal) + current[0]
 
             fringe.put((cost, nextPos, stepcnt + 1))
             lastPos[0][nx][ny] = x
@@ -99,9 +103,11 @@ def aStar(m, distType = 1):
     return (blockCount, goalPath, routeLength)
 
 if __name__ == '__main__':
-    M = buildUp(size = 256, p = 0.2)
-    t = aStar(m = M, distType = 1)
-    t2 = aStar(m = M, distType = 2)
+    M = buildUp(size = 25, p = 0.3)
+    t = aStar(m = M, distFunction = euclideanDist)
+    t2 = aStar(m = M, distFunction = manhattanDist)
+    t3 = aStar(m = M, distFunction = chebyshevDist)
     print(t)
     print(t2)
+    print(t3)
     #M.visualize()
