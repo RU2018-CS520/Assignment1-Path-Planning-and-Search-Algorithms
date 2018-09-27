@@ -15,7 +15,7 @@ def isValid(m, size, nextPos):
     y = int(nextPos[1])
     if x < 0 or y < 0 or x >= size or y >= size:
         return False
-    if m.cell[x][y] == 1:
+    if m.wall[x][y]:
         return False
     return True
 
@@ -42,7 +42,7 @@ def chebyshevDist(u, v):
  
 def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	#int rows in [2 : inf]: maze width and height
-	#float p in [0 : 1]: probablity of a cell becomes a wall
+	#float p in [0 : 1]: probablity of a block becomes a wall
 	#function initFunction: init walls, None default trivalInit()
 	#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
 	m = frame.maze(rows = size, cols = size, p = p)
