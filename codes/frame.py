@@ -6,11 +6,11 @@ class maze(object):
 	def __init__(self, rows = 10, cols = 10, p = 0.2):
 		#int rows in [2 : inf]: maze width
 		#int cols in [2 : inf]: maze height
-		#float p in [0 : 1]: probablity of a cell becomes a wall
+		#float p in [0 : 1]: probablity of a block becomes a wall
 		self.rows = rows
 		self.cols = cols
 		self.p = p
-		self.cell = np.zeros((rows, cols), dtype = np.uint8)
+		self.wall = np.zeros((rows, cols), dtype = np.bool)
 		self.path = None
 		self.isBuilt = False
 
@@ -24,11 +24,11 @@ class maze(object):
 			for row in range(maze.rows):
 				for col in range(maze.cols):
 					if random.random() < maze.p:
-						maze.cell[row, col] = 1
+						maze.wall[row, col] = True
 
 		if self.isBuilt:
 			if force:
-				self.cell = np.zeros_like(self.cell, dtype = np.uint8)
+				self.wall = np.zeros_like(self.wall, dtype = np.bool)
 			else:
 				print('W: maze.build(), duplicate build')
 				return
@@ -42,8 +42,8 @@ class maze(object):
 		if randomPosition is False:
 			self.start = (0, 0)
 			self.goal = (self.rows-1, self.cols-1)
-			self.cell[self.start] = 0
-			self.cell[self.goal] = 0
+			self.wall[self.start] = 0
+			self.wall[self.goal] = 0
 		else:
 			#TODO: randomlize S and G
 			pass
@@ -51,7 +51,7 @@ class maze(object):
 
 
 	def visualize(self, size = 20, grid = 1):
-		#int size in [0 : inf]: cell size(width and height)
+		#int size in [0 : inf]: block size(width and height)
 		#int grid in [0 : size//2]: grid width
 			
 		def gridOn(image, size = 20, grid = 1, color = 128):
@@ -71,7 +71,7 @@ class maze(object):
 		#block
 		for row in range(self.rows):
 			for col in range(self.cols):
-				if self.cell[row, col] == 1:
+				if self.wall[row, col] == 1:
 					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255 #TODO: adapt to chromatic image
 		#path
 		if self.path is not None:
@@ -81,17 +81,17 @@ class maze(object):
 			#start & goal
 			sgColor = 32
 			backColor = 0
-			for cell in [self.start, self.goal]:
-				image[cell[0]*size+grid : cell[0]*size+size-grid, cell[1]*size+grid : cell[1]*size+size-grid] = sgColor
+			for block in [self.start, self.goal]:
+				image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+grid : block[1]*size+size-grid] = sgColor
 				#break outer wall
-				if cell[0] == 0: #first row, break wall U
-					image[0 : grid, cell[1]*size+grid : cell[1]*size+size-grid] = backColor
-				if cell[0] == self.rows-1: #last row, break wall D
-					image[cell[0]*size+size-grid : cell[0]*size+size, cell[1]*size+grid : cell[1]*size+size-grid] = backColor
-				if cell[1] == 0: #first col, break wall L
-					image[cell[0]*size+grid : cell[0]*size+size-grid, 0 : grid] = backColor
-				if cell[1] == self.cols-1: #last col, break wall R
-					image[cell[0]*size+grid : cell[0]*size+size-grid, cell[1]*size+size-grid : cell[1]*size+size] = backColor
+				if block[0] == 0: #first row, break wall U
+					image[0 : grid, block[1]*size+grid : block[1]*size+size-grid] = backColor
+				if block[0] == self.rows-1: #last row, break wall D
+					image[block[0]*size+size-grid : block[0]*size+size, block[1]*size+grid : block[1]*size+size-grid] = backColor
+				if block[1] == 0: #first col, break wall L
+					image[block[0]*size+grid : block[0]*size+size-grid, 0 : grid] = backColor
+				if block[1] == self.cols-1: #last col, break wall R
+					image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+size-grid : block[1]*size+size] = backColor
 		#plot image
 		plt.imshow(image, cmap = plt.cm.Greys, interpolation = 'none')
 		plt.show() #TODO: non-block call
