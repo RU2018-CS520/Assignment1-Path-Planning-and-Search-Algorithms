@@ -3,16 +3,18 @@ import numpy as np
 import random
 import itertools
 
-def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False):
+#init maze
+def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False, force = False):
 	##int rows in [2 : inf]: maze width and height
 	#float p in [0 : 1]: probablity of a block becomes a wall
 	#function initFunction: init walls, None default trivalInit()
 	#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
+	#bool force: True: force to rebuild maze; False: if maze.isBuilt immediately return original maze
 	m = frame.maze(rows = size, cols = size, p = p)
-	m.build()
+	m.build(initFunction = initFunction, randomPosition = randomPosition, force = force)
 	return m
 
-
+#explore temp's neighbor
 def expand(m, temp, closed, randomWalk = True, updatable = False, tempPath = -1):
 	#INPUT ARGS:
 	#class maze m: maze to be solved
@@ -49,14 +51,14 @@ def expand(m, temp, closed, randomWalk = True, updatable = False, tempPath = -1)
 
 
 def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
-	#INPUT ARGS:
+	#INPUT ARGS: #further reading: description.md
 	#class maze m: maze to be solved
-	#bool IDDFS: True: Iterative Deepening Depth First Search, promise optimal if updatable; False: DFS, much absolutely faster
-	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe, promise optimal if expand(updatable), works well with checkFringe; False: return as soon as goal, usually faster 
-	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe, in this case, DFS, effective and WITHOUT ANY COST; False: return when pop goal out from fringe
-	#bool randomWalk: True: partially randomly pick a neighbor as next block, priority R and D > L and U, might works well; False: priority: strictly R > D > L > U, seems effective in this diagonal maze
-	#bool randomWalkPlus: True: force randomWalk = True, totally random, no priority, may be effictive when randomPosition; False: depend on randomWalk
-	#bool checkFringe: True: besides closed set, keep fringe distinct, to some extent, return a shorter path, but NOT DEFINITELY SHORTEST; False: just keep no back turning, a little bit faster
+	#bool IDDFS: True: Iterative Deepening Depth First Search; False: DFS
+	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe; False: return as soon as goal, usually faster 
+	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe; False: return when pop goal out from fringe
+	#bool randomWalk: True: priority: R and D > L and U; False: priority: strictly R > D > L > U
+	#bool randomWalkPlus: True: totally random, no priority; False: depend on randomWalk
+	#bool checkFringe: True: keep fringe distinct; False: just keep no back turning
 	#RETURN VALUE:
 	#int blockCount in [1 : inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
@@ -98,7 +100,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 					continue
 				#not keepSearch => first avilible path, or it have already returned; no path exist or longer path => update path
 				goalPath = tempPath.copy() #hard copy
-				depthLimit = len(goalPath) - 1
+				depthLimit = len(goalPath) - 1 #no need to search deeper blocks
 				if keepSearch:
 					continue
 				return (blockCount, goalPath, maxDepth)
@@ -153,11 +155,11 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False, depthLimit = 0):
 	#INPUT ARGS:
 	#class maze m: maze to be solved
-	#bool BDBFS
-	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe, in this case, DFS, effective and WITHOUT ANY COST; False: return when pop goal out from fringe
-	#bool randomWalk: True: partially randomly pick a neighbor as next block, priority R and D > L and U, might works well; False: priority: strictly R > D > L > U, seems effective in this diagonal maze
-	#bool randomWalkPlus: True: force randomWalk = True, totally random, no priority, may be effictive when randomPosition; False: depend on randomWalk
-	#bool checkFringe: True: besides closed set, keep fringe distinct, to some extent, return a shorter path, but NOT DEFINITELY SHORTEST; False: just keep no back turning, a little bit faster
+	#bool BDBFS: True: BiDirectional Breadth First Search; False: BFS
+	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe; False: return when pop goal out from fringe
+	#bool randomWalk: True: priority: R and D > L and U; False: priority: strictly R > D > L > U
+	#bool randomWalkPlus: True: totally random, no priority; False: depend on randomWalk
+	#bool checkFringe: True: keep fringe distinct; False: just keep no back turning
 	#int depthLimit in [1 : inf]: used to limit depth explores, 0 if n/a
 	#RETURN VALUE:
 	#int blockCount in [1 : inf]: the number of blocks have opend
@@ -246,9 +248,9 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 
 
 if __name__ == '__main__':
-	M = buildUp(size = 7, p = 0.2)
-	M.visualize()
-	count, path, maxDepth = BFS(M, checkFringe = True)
+	M = buildUp(size = 128, p = 0.2)
+	M.visualize(size = 10)
+	count, path, maxDepth = BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
 	print(count)
 	print(path)
 	print(len(path))
