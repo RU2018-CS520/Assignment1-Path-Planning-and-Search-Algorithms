@@ -42,8 +42,8 @@ class maze(object):
 		if randomPosition is False:
 			self.start = (0, 0)
 			self.goal = (self.rows-1, self.cols-1)
-			self.wall[self.start] = 0
-			self.wall[self.goal] = 0
+			self.wall[self.start] = False
+			self.wall[self.goal] = False
 		else:
 			#TODO: randomlize S and G
 			pass
@@ -71,7 +71,7 @@ class maze(object):
 		#block
 		for row in range(self.rows):
 			for col in range(self.cols):
-				if self.wall[row, col] == 1:
+				if self.wall[row, col]:
 					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255 #TODO: adapt to chromatic image
 		#path
 		if self.path is not None:
