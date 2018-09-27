@@ -1,6 +1,8 @@
 import random
 import numpy as np
 from matplotlib import pyplot as plt
+from PIL import Image, ImageChops
+
 
 class maze(object):
 	def __init__(self, rows = 10, cols = 10, p = 0.2):
@@ -51,20 +53,23 @@ class maze(object):
 
 
 	def visualize(self, size = 20, grid = 1):
+		#INPUT ARGS:
 		#int size in [0 : inf]: block size(width and height)
 		#int grid in [0 : size//2]: grid width
+		#RETURN VALUE:
+		#PIL.Image.Image img with mode = RGB: hi-res output maze map
 			
 		def gridOn(image, size = 20, grid = 1, color = 128):
 			#np.array image with ndim = 2: output maze map image
 			#int color in [0 : 255]: grid color #TODO: adapt to chromatic image
 			for row in range(self.rows):
-				image[row*size : row*size+grid, :] = color
-				image[row*size+size-grid : row*size+size, :] = color
+				image[row*size : row*size+grid, :, :] = color
+				image[row*size+size-grid : row*size+size, :, :] = color
 				for col in range(self.cols):
-					image[:, col*size : col*size+grid] = color
-					image[:, col*size+size-grid : col*size+size] = color
+					image[:, col*size : col*size+grid, :] = color
+					image[:, col*size+size-grid : col*size+size, :] = color
 
-		image = np.zeros((self.rows*size, self.cols*size), dtype = np.uint8) #TODO: adapt to chromatic image
+		image = np.zeros((self.rows*size, self.cols*size, 3), dtype = np.uint8) #TODO: adapt to chromatic image
 		#grid
 		if grid != 0:
 			gridOn(image, size, grid, color = 64)
@@ -75,29 +80,45 @@ class maze(object):
 					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255 #TODO: adapt to chromatic image
 		#path
 		if self.path is not None:
-			#TODO: colorize path
-			pass
+			sColor = [82, 172, 118]
+			gColor = [195, 239, 172]
+			rStart = sColor[0]
+			gStart = sColor[1]
+			bStart = sColor[2]
+			rDist = gColor[0] - sColor[0]
+			gDist = gColor[1] - sColor[1]
+			bDist = gColor[2] - sColor[2]
+			length = len(self.path)
+			for i in range(length):
+				row = self.path[i][0]
+				col = self.path[i][1]
+				image[row*size : row*size+size, col*size : col*size+size] = (rStart+i*rDist//length, gStart+i*gDist//length, bStart+i*bDist//length)
 		else:
 			#start & goal
-			sgColor = 32
+			sgColor = [82, 172, 118]
 			backColor = 0
 			for block in [self.start, self.goal]:
-				image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+grid : block[1]*size+size-grid] = sgColor
+				image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+grid : block[1]*size+size-grid, :] = sgColor
 				#break outer wall
 				if block[0] == 0: #first row, break wall U
-					image[0 : grid, block[1]*size+grid : block[1]*size+size-grid] = backColor
+					image[0 : grid, block[1]*size+grid : block[1]*size+size-grid, :] = backColor
 				if block[0] == self.rows-1: #last row, break wall D
-					image[block[0]*size+size-grid : block[0]*size+size, block[1]*size+grid : block[1]*size+size-grid] = backColor
+					image[block[0]*size+size-grid : block[0]*size+size, block[1]*size+grid : block[1]*size+size-grid, :] = backColor
 				if block[1] == 0: #first col, break wall L
-					image[block[0]*size+grid : block[0]*size+size-grid, 0 : grid] = backColor
+					image[block[0]*size+grid : block[0]*size+size-grid, 0 : grid, :] = backColor
 				if block[1] == self.cols-1: #last col, break wall R
-					image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+size-grid : block[1]*size+size] = backColor
+					image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+size-grid : block[1]*size+size, :] = backColor
 		#plot image
-		plt.imshow(image, cmap = plt.cm.Greys, interpolation = 'none')
+		img = Image.fromarray(image) 
+		img = ImageChops.invert(img)
+		plt.imshow(img)
 		plt.show() #TODO: non-block call
+		return img
 
 if __name__ == '__main__':
 	M = maze(10, 10, 0.2)
-	for i in range(10):
-		M.build(force = True)
-		M.visualize()
+	M.build()
+	img = M.visualize()
+	path = 'D:/Users/endle/Desktop/520/'
+	name = 'maze.png'
+	img.save(path+name, 'PNG')

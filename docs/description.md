@@ -19,7 +19,7 @@ bool isBuilt: True: has built up walls, do NOT build it again; False: empty maze
 **member funcs:**
 ```
 build(): build up walls, define maze.start and maze.goal
-visualize(): plot maze map with path if exist.
+visualize(): plot maze map with path if exist, return a PIL.Image.Image img
 ```
 
 **usage:**
@@ -42,6 +42,19 @@ blockCount, path, depth = solution.DFS(m, quickGoal = True, randomWalk = True, c
 m.path = path
 if m.path:
 	foobar(m.path)
+```
+save map
+```
+import frame
+import solution
+m = frame.maze()
+m.build()
+count, path, depth = solution.DFS(m)
+m.path = path
+img = m.visualize(size = 10, grid = 1)
+path = 'D:/Users/endle/Desktop/520/'
+name = 'maze.png'
+img.save(path+name, 'PNG')
 ```
 
 ## solution
@@ -80,7 +93,7 @@ bool checkFringe:
 ```
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks have opend, used to mesure how hard the maze is
+int blockCount in [1 : inf]: the number of blocks has been opened, used to measure how hard the maze is
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
@@ -152,7 +165,7 @@ bool randomWalk:
 	True: partially randomly pick a neighbor as next block. priority: R and D > L and U, might work well;
 	False: priority: strictly R > D > L > U, seems effective in this diagonal maze
 bool randomWalkPlus: 
-	True: totally random, no priority. may be effictive when maze.build(randomPosition)
+	True: totally random, no priority. may be effective when maze.build(randomPosition)
 		Caution: force randomWalk = True
 	False: depend on randomWalk
 bool checkFringe:
@@ -164,7 +177,7 @@ int depthLimit in [1 : inf]:
 
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks have opend, used to mesure how hard the maze is
+int blockCount in [1 : inf]: the number of blocks has been opened, used to measure how hard the maze is
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
