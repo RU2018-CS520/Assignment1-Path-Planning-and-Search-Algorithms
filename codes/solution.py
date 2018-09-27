@@ -5,7 +5,7 @@ import itertools
 
 def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False):
 	##int rows in [2 : inf]: maze width and height
-	#float p in [0 : 1]: probablity of a cell becomes a wall
+	#float p in [0 : 1]: probablity of a block becomes a wall
 	#function initFunction: init walls, None default trivalInit()
 	#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
 	m = frame.maze(rows = size, cols = size, p = p)
@@ -29,16 +29,16 @@ def expand(m, temp, closed, randomWalk = True, updatable = False, tempPath = -1)
 	tempFringeUL = []
 	tempFringeDR = []
 	#DO NOT CHANGE THE ORDER. r and d is prior than l and u in this diagonal maze
-	if row != 0 and m.cell[row-1, col] != 1: #legal check
+	if row != 0 and not m.wall[row-1, col]: #legal check
 		if closed[row-1, col] == 0 or (updatable and closed[row-1, col] > tempPath): #unexplored or updatable
 			tempFringeUL.append((row-1, col)) #U
-	if col != 0 and m.cell[row, col-1] != 1: #legal check
+	if col != 0 and not m.wall[row, col-1]: #legal check
 		if closed[row, col-1] == 0 or (updatable and closed[row, col-1] > tempPath): #unexplored or updatable
 			tempFringeUL.append((row, col-1)) #L
-	if row != m.rows-1 and m.cell[row+1, col] != 1: #legal check
+	if row != m.rows-1 and not m.wall[row+1, col]: #legal check
 		if closed[row+1, col] == 0 or (updatable and closed[row+1, col] > tempPath): #unexplored or updatable
 			tempFringeDR.append((row+1, col)) #D
-	if col != m.cols-1 and m.cell[row, col+1] != 1: #legal check
+	if col != m.cols-1 and not m.wall[row, col+1]: #legal check
 		if closed[row, col+1] == 0 or (updatable and closed[row, col+1] > tempPath): #unexplored or updatable
 			tempFringeDR.append((row, col+1)) #R
 	#respectively shuffle
@@ -70,7 +70,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		#others see DFS
 		tempPath = []
 		fringe = []
-		closed = np.zeros_like(m.cell, dtype = np.uint32) #memory cost, but compatible with checkFringe #TODO: what if size > 65000
+		closed = np.zeros_like(m.wall, dtype = np.uint32) #memory cost, but compatible with checkFringe #TODO: what if size > 65000
 		blockCount = 0
 		goalPath = []
 		maxDepth = 0
@@ -173,12 +173,12 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 
 	sPath = []
 	sFringe = []
-	sClosed = np.zeros_like(m.cell, dtype = np.uint32)
-	sPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
+	sClosed = np.zeros_like(m.wall, dtype = np.uint32)
+	sPrev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
 	gPath = []
 	gFringe = []
-	gClosed = np.zeros_like(m.cell, dtype = np.uint32)
-	gPrev = np.full((m.cell.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
+	gClosed = np.zeros_like(m.wall, dtype = np.uint32)
+	gPrev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
 	blockCount = 0
 	maxDepth = 0
 	#init fringe
@@ -246,9 +246,9 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 
 
 if __name__ == '__main__':
-	M = buildUp(size = 10, p = 0.23)
+	M = buildUp(size = 7, p = 0.2)
 	M.visualize()
-	count, path, maxDepth = DFS(M, keepSearch = True)
+	count, path, maxDepth = BFS(M, checkFringe = True)
 	print(count)
 	print(path)
 	print(len(path))
