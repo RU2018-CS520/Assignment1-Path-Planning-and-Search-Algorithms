@@ -52,47 +52,68 @@ class maze(object):
 		self.isBuilt = True
 
 
-	def visualize(self, size = 20, grid = 1):
+	def visualize(self, size = 20, grid = 1, outerPath = None):
 		#INPUT ARGS:
 		#int size in [0 : inf]: block size(width and height)
 		#int grid in [0 : size//2]: grid width
+		#list outerPath with element (row, col): a path from S to G. None or [] if not exist
 		#RETURN VALUE:
 		#PIL.Image.Image img with mode = RGB: hi-res output maze map
 			
-		def gridOn(image, size = 20, grid = 1, color = 128):
+		def gridOn(image, size = 20, grid = 1, color = 64, beacon = 128, distance = 16):
 			#np.array image with ndim = 2: output maze map image
 			#int color in [0 : 255]: grid color #TODO: adapt to chromatic image
+			#int beacon in [0 : 255]: beacon gird for every 64 blocks
 			for row in range(self.rows):
-				image[row*size : row*size+grid, :, :] = color
-				image[row*size+size-grid : row*size+size, :, :] = color
-				for col in range(self.cols):
-					image[:, col*size : col*size+grid, :] = color
+				if not bool(row%distance): #beacon
+					image[row*size : row*size+grid+1, :, :] = beacon
+					image[row*size+size-grid-1 : row*size+size, :, :] = beacon
+				else:
+					image[row*size : row*size+grid+1, :, :] = color
+					image[row*size+size-grid-1 : row*size+size, :, :] = color
+
+			for col in range(self.cols):
+				if not bool(col%distance): #beacon
+					image[:, col*size : col*size+grid+1, :] = beacon
+					image[:, col*size+size-grid : col*size+size, :] = beacon
+				else:
+					image[:, col*size : col*size+grid+1, :] = color
 					image[:, col*size+size-grid : col*size+size, :] = color
 
-		image = np.zeros((self.rows*size, self.cols*size, 3), dtype = np.uint8) #TODO: adapt to chromatic image
-		#grid
-		if grid != 0:
-			gridOn(image, size, grid, color = 64)
-		#block
+		if outerPath:
+			path = outerPath
+		else:
+			path = self.path
+		
+		image = np.zeros((self.rows*size, self.cols*size, 3), dtype = np.uint8)
+		#wall
 		for row in range(self.rows):
 			for col in range(self.cols):
 				if self.wall[row, col]:
-					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255 #TODO: adapt to chromatic image
+					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255
+		#grid
+		if grid != 0:
+			gridOn(image, size, grid, color = 64)
 		#path
-		if self.path is not None:
+		if path:
 			sColor = [82, 172, 118]
 			gColor = [195, 239, 172]
+			beacon = [0, 0, 255]
+			distance = 32
 			rStart = sColor[0]
 			gStart = sColor[1]
 			bStart = sColor[2]
 			rDist = gColor[0] - sColor[0]
 			gDist = gColor[1] - sColor[1]
 			bDist = gColor[2] - sColor[2]
-			length = len(self.path)
+			length = len(path)
 			for i in range(length):
-				row = self.path[i][0]
-				col = self.path[i][1]
-				image[row*size : row*size+size, col*size : col*size+size] = (rStart+i*rDist//length, gStart+i*gDist//length, bStart+i*bDist//length)
+				row = path[i][0]
+				col = path[i][1]
+				if not bool(i%distance):
+					image[row*size : row*size+size, col*size : col*size+size] = (beacon[0], beacon[1], beacon[2] - (i//distance)*2)
+				else:
+					image[row*size : row*size+size, col*size : col*size+size] = (rStart+i*rDist//length, gStart+i*gDist//length, bStart+i*bDist//length)
 		else:
 			#start & goal
 			sgColor = [82, 172, 118]
@@ -116,7 +137,7 @@ class maze(object):
 		return img
 
 if __name__ == '__main__':
-	M = maze(10, 10, 0.2)
+	M = maze(128, 128, 0.2)
 	M.build()
 	img = M.visualize()
 	path = 'D:/Users/endle/Desktop/520/'
