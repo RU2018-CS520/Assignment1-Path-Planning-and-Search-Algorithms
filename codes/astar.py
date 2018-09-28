@@ -49,7 +49,7 @@ def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	m.build()
 	return m
 
-def aStar(m, distFunction = manhattanDist):
+def aStar(m, distFunction = manhattanDist, LIFO = True):
     #INPUT ARGS:
 	#class maze m: maze to be solved
     #int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
@@ -65,14 +65,17 @@ def aStar(m, distFunction = manhattanDist):
     goalPath = []
     routeLength = -1
 
-    fringe.put((euclideanDist(m.start, m.goal), m.start, 0))
+    fringe.put(((distFunction(m.start, m.goal), blockCount), m.start, 0))
 
     while not fringe.empty():
         current = fringe.get()
         stepcnt = current[2]
         x = current[1][0]
         y = current[1][1]
-        blockCount += 1
+        if LIFO:
+            blockCount -= 1
+        else:
+            blockCount += 1
         if current[1] == m.goal:
             routeLength = stepcnt
             tx = x
@@ -94,20 +97,26 @@ def aStar(m, distFunction = manhattanDist):
             if closed[nx][ny] == 1:
                 continue
             closed[nx][ny] = 1
-            cost = distFunction(nextPos, m.goal) + current[0]
+            cost = distFunction(nextPos, m.goal) + current[0][0]
 
-            fringe.put((cost, nextPos, stepcnt + 1))
+            fringe.put(((cost, blockCount), nextPos, stepcnt + 1))
             lastPos[0][nx][ny] = x
             lastPos[1][nx][ny] = y
 
-    return (blockCount, goalPath, routeLength)
+    return (abs(blockCount), goalPath, routeLength)
 
 if __name__ == '__main__':
-    M = buildUp(size = 25, p = 0.3)
-    t = aStar(m = M, distFunction = euclideanDist)
-    t2 = aStar(m = M, distFunction = manhattanDist)
-    t3 = aStar(m = M, distFunction = chebyshevDist)
-    print(t)
-    print(t2)
-    print(t3)
+    M = buildUp(size = 128, p = 0.35)
+    t1 = aStar(m = M, distFunction = euclideanDist, LIFO = True)
+    t2 = aStar(m = M, distFunction = euclideanDist, LIFO = False)
+    t3 = aStar(m = M, distFunction = manhattanDist, LIFO = True)
+    t4 = aStar(m = M, distFunction = manhattanDist, LIFO = False)
+    t5 = aStar(m = M, distFunction = chebyshevDist, LIFO = True)
+    t6 = aStar(m = M, distFunction = chebyshevDist, LIFO = False)
+    print(str(t1[0]) + ", " + str(t1[2]))
+    print(str(t2[0]) + ", " + str(t2[2]))
+    print(str(t3[0]) + ", " + str(t3[2]))
+    print(str(t4[0]) + ", " + str(t4[2]))
+    print(str(t5[0]) + ", " + str(t5[2]))
+    print(str(t6[0]) + ", " + str(t6[2]))
     #M.visualize()
