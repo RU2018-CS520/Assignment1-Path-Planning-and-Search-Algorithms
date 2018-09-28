@@ -2,7 +2,6 @@ import frame
 import queue
 import numpy as NP
 import math
-import solution
 
 dir = [[-1, 0], [1, 0], [0, -1], [0, 1]] #directions of moving, respectively up, down, left, right
 
@@ -50,10 +49,10 @@ def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	m.build()
 	return m
 
-def aStar(m, distFunction = manhattanDist, LIFO = True):
+def idaStar(m, distFunction = manhattanDist):
     #INPUT ARGS:
 	#class maze m: maze to be solved
-    #int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
+    #int distType: a number indicating which method of distance calculation to use. idaStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
@@ -66,21 +65,16 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
     goalPath = []
     routeLength = -1
 
-    fringe.put(((distFunction(m.start, m.goal), blockCount), m.start, 0))
+    fringe.put((euclideanDist(m.start, m.goal), m.start, 0))
 
     while not fringe.empty():
         current = fringe.get()
         stepcnt = current[2]
         x = current[1][0]
         y = current[1][1]
-        if closed[x][y] > 0:
-            continue
-        closed[x][y] = 1
-        if LIFO:
-            blockCount -= 1
-        else:
-            blockCount += 1
+        blockCount += 1
         if current[1] == m.goal:
+            routeLength = stepcnt
             tx = x
             ty = y
             for i in range(stepcnt):
@@ -88,8 +82,6 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
                 tmp = lastPos[0][tx][ty]
                 ty = lastPos[1][tx][ty]
                 tx = tmp
-            goalPath.append((0, 0))
-            routeLength = len(goalPath)
             goalPath.reverse()
             break
 
@@ -99,36 +91,35 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
             nextPos = (nx, ny)
             if not isValid(m, size, nextPos):
                 continue
-            #if (closed[nx][ny] > 0 and stepcnt + 1 >= closed[nx][ny]):
-            if closed[nx][ny] > 0:
+            if closed[nx][ny] == 1:
                 continue
-            cost = distFunction(nextPos, m.goal) + current[0][0]
-            fringe.put(((cost, blockCount), nextPos, stepcnt + 1))
+            closed[nx][ny] = 1
+            cost = distFunction(nextPos, m.goal) + current[0]
+
+            fringe.put((cost, nextPos, stepcnt + 1))
             lastPos[0][nx][ny] = x
             lastPos[1][nx][ny] = y
 
-    return (abs(blockCount), goalPath, routeLength)
+    return (blockCount, goalPath, routeLength)
+
+def dfs(m, route, g, bound, distFunction = euclideanDist):
+    u = route[end]
+    f = g + distFunction(u, m.goal)
+    if f > bound:
+        return f
+    if u == m.goal:
+        return (-1, route)
+    minn = 0x7fffffff 
+    print(minn)
+    for i in range(4):
+
 
 if __name__ == '__main__':
-    M = buildUp(size = 128, p = 0.35)
-    t1 = aStar(m = M, distFunction = euclideanDist, LIFO = True)
-    t2 = aStar(m = M, distFunction = euclideanDist, LIFO = False)
-    t3 = aStar(m = M, distFunction = manhattanDist, LIFO = True)
-    t4 = aStar(m = M, distFunction = manhattanDist, LIFO = False)
-    t5 = aStar(m = M, distFunction = chebyshevDist, LIFO = True)
-    t6 = aStar(m = M, distFunction = chebyshevDist, LIFO = False)
-    t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
-    print(str(t1[0]) + ", " + str(t1[2]))
-    print(str(t2[0]) + ", " + str(t2[2]))
-    print(str(t3[0]) + ", " + str(t3[2]))
-    print(str(t4[0]) + ", " + str(t4[2]))
-    print(str(t5[0]) + ", " + str(t5[2]))
-    print(str(t6[0]) + ", " + str(t6[2]))
-    l = len(t7[1])
-    print(str(t7[0]) + ", " + str(l))
-    M.path = t1[1]
-    imgastar = M.visualize()
-    M.path = t7[1]
-    imgbfs = M.visualize()
-    imgastar.save('/home/shengjie/astar.png', 'PNG')
-    imgbfs.save('/home/shengjie/bfs.png', 'PNG')
+    M = buildUp(size = 25, p = 0.3)
+    t = idaStar(m = M, distFunction = euclideanDist)
+    t2 = idaStar(m = M, distFunction = manhattanDist)
+    t3 = idaStar(m = M, distFunction = chebyshevDist)
+    print(t)
+    print(t2)
+    print(t3)
+    #M.visualize()
