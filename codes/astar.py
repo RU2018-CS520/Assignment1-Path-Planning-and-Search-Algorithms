@@ -61,12 +61,14 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
     size = m.rows
     fringe = queue.PriorityQueue()
     closed = NP.zeros([size, size], dtype = int)
+    gscore = NP.full([size, size], NP.inf)
     lastPos = [NP.zeros([size, size], dtype = int), NP.zeros([size, size], dtype = int)]
     blockCount = 0
     goalPath = []
     routeLength = -1
 
     fringe.put(((distFunction(m.start, m.goal), blockCount), m.start, 0))
+    gscore[0][0] = 0
 
     while not fringe.empty():
         current = fringe.get()
@@ -102,7 +104,11 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
             #if (closed[nx][ny] > 0 and stepcnt + 1 >= closed[nx][ny]):
             if closed[nx][ny] > 0:
                 continue
-            cost = distFunction(nextPos, m.goal) + current[0][0]
+            tg = 1 + gscore[x][y]
+            if tg >= gscore[nx][ny]:
+                continue
+            gscore[nx][ny] = tg
+            cost = tg + distFunction(nextPos, m.goal)
             fringe.put(((cost, blockCount), nextPos, stepcnt + 1))
             lastPos[0][nx][ny] = x
             lastPos[1][nx][ny] = y
