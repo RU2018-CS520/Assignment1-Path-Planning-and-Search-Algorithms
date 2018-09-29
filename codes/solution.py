@@ -5,7 +5,7 @@ import itertools
 
 #init maze
 def buildUp(size = 10, p = 0.2, initFunction = None, randomPosition = False, force = False):
-	##int rows in [2 : inf]: maze width and height
+	##int size in [2 : inf]: maze width and height
 	#float p in [0 : 1]: probablity of a block becomes a wall
 	#function initFunction: init walls, None default trivalInit()
 	#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
