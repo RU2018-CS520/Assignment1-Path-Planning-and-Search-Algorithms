@@ -93,7 +93,7 @@ bool checkFringe:
 ```
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks have opend, used to mesure how hard the maze is
+int blockCount in [1 : inf]: the number of blocks has opened, used to measure how hard the maze is
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
@@ -165,7 +165,7 @@ bool randomWalk:
 	True: partially randomly pick a neighbor as next block. priority: R and D > L and U, might work well;
 	False: priority: strictly R > D > L > U, seems effective in this diagonal maze
 bool randomWalkPlus: 
-	True: totally random, no priority. may be effictive when maze.build(randomPosition)
+	True: totally random, no priority. may be effective when maze.build(randomPosition)
 		Caution: force randomWalk = True
 	False: depend on randomWalk
 bool checkFringe:
@@ -177,7 +177,7 @@ int depthLimit in [1 : inf]:
 
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks have opend, used to mesure how hard the maze is
+int blockCount in [1 : inf]: the number of blocks has opened, used to measure how hard the maze is
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
