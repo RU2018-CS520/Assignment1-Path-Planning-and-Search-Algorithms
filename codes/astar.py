@@ -57,7 +57,7 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
-	#int routeLength: the length of the route from start to goal
+	#int maxFringeSize in [1, inf]: the max size of fringe
 	size = m.rows
 	fringe = queue.PriorityQueue()
 	closed = NP.zeros_like(m.wall, dtype = NP.uint32)
@@ -65,6 +65,7 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
 	blockCount = 0
 	goalPath = []
 	routeLength = 0
+	maxFringeSize = 1
 
 	fringe.put(((distFunction(m.start, m.goal), blockCount), m.start, 1))
 
@@ -101,11 +102,16 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
 			cost = distFunction(nextPos, m.goal) + stepcnt + 1
 			fringe.put(((cost, blockCount), nextPos, stepcnt + 1))
 			lastPos[nx, ny] = (x, y)
+		#update fringe size
+		fringeSize = fringe.qsize()
+		if fringeSize > maxFringeSize:
+			maxFringeSize = fringeSize
 
-	return (abs(blockCount), goalPath, routeLength)
+
+	return (abs(blockCount), goalPath, maxFringeSize)
 
 if __name__ == '__main__':
-	M = buildUp(size = 128, p = 0.35)
+	M = buildUp(size = 128, p = 0.10)
 	t1 = aStar(m = M, distFunction = euclideanDist, LIFO = True)
 	t2 = aStar(m = M, distFunction = euclideanDist, LIFO = False)
 	t3 = aStar(m = M, distFunction = manhattanDist, LIFO = True)
@@ -113,17 +119,17 @@ if __name__ == '__main__':
 	t5 = aStar(m = M, distFunction = chebyshevDist, LIFO = True)
 	t6 = aStar(m = M, distFunction = chebyshevDist, LIFO = False)
 	t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
-	print(str(t1[0]) + ", " + str(t1[2]))
-	print(str(t2[0]) + ", " + str(t2[2]))
-	print(str(t3[0]) + ", " + str(t3[2]))
-	print(str(t4[0]) + ", " + str(t4[2]))
-	print(str(t5[0]) + ", " + str(t5[2]))
-	print(str(t6[0]) + ", " + str(t6[2]))
+	print(str(t1[0]) + ", " + str(len(t1[1])) +', '+ str(t1[2]))
+	print(str(t2[0]) + ", " + str(len(t2[1])) +', '+ str(t2[2]))
+	print(str(t3[0]) + ", " + str(len(t3[1])) +', '+ str(t3[2]))
+	print(str(t4[0]) + ", " + str(len(t4[1])) +', '+ str(t4[2]))
+	print(str(t5[0]) + ", " + str(len(t5[1])) +', '+ str(t5[2]))
+	print(str(t6[0]) + ", " + str(len(t6[1])) +', '+ str(t6[2]))
 	l = len(t7[1])
 	print(str(t7[0]) + ", " + str(l))
 	M.path = t1[1]
 	imgastar = M.visualize()
 	M.path = t7[1]
 	imgbfs = M.visualize()
-	imgastar.save('/home/shengjie/astar.png', 'PNG')
-	imgbfs.save('/home/shengjie/bfs.png', 'PNG')
+#	imgastar.save('/home/shengjie/astar.png', 'PNG')
+#	imgbfs.save('/home/shengjie/bfs.png', 'PNG')
