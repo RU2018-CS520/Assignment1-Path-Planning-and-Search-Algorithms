@@ -49,6 +49,19 @@ def expand(m, temp, closed, randomWalk = True, updatable = False, tempPath = -1)
 		random.shuffle(tempFringeDR)
 	return tempFringeUL + tempFringeDR
 
+def getPath(temp, prev, start):
+	#INPUT ARGS:
+	#(row, col) temp: temp processing block
+	#np.array prev with ndim = 2: record temp's prev block (row, col). (m.rows, m.cols) if n/a
+	#(row, col) start: path's start block
+	#RETURN VALUE:
+	#list path with element (row, col): a path from temp to S.
+	path = []
+	while temp != start:
+		path.append(temp)
+		temp = tuple(prev[temp])
+	return path + [start]
+
 
 def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
 	#INPUT ARGS: #further reading: description.md
@@ -70,40 +83,37 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		#OUTPUT ARGS: 
 		#int maxDepth in [1 : inf]: max depth of searched blocks
 		#others see DFS
-		tempPath = []
 		fringe = []
 		closed = np.zeros_like(m.wall, dtype = np.uint32) #memory cost, but compatible with checkFringe #TODO: what if size > 65000
+		prev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
+		prev[m.start] = m.start
 		blockCount = 0
 		goalPath = []
 		maxDepth = 0
 		tempDepth = 0
+		maxFirngeSize = 1
 		#init fringe
-		fringe.extend(['pop',m.start])
+		fringe.append((m.start, 1))
 		#core
 		while fringe:
-			temp = fringe.pop()
-			#modify path to temp block
-			if temp == 'pop':
-				tempPath.pop()
+			temp, tempDepth = fringe.pop()
+			#pre
+			if checkFringe and closed[temp] != 0 and closed[temp] < tempDepth:
 				continue
-			else:
-				if checkFringe and closed[temp] != 0 and closed[temp] < len(tempPath) + 1:
-					continue
-				tempPath.append(temp)
-				tempDepth = len(tempPath)
-				if tempDepth > maxDepth:
-					maxDepth = tempDepth
+			if tempDepth > maxDepth:
+				maxDepth = tempDepth
 			#process block
 			blockCount = blockCount + 1
 			if temp == m.goal: #done
 				if keepSearch and goalPath and len(goalPath) <= tempDepth: #keepSearch and path already exist and shorter
 					continue
 				#not keepSearch => first avilible path, or it have already returned; no path exist or longer path => update path
-				goalPath = tempPath.copy() #hard copy
+				goalPath = getPath(temp, prev, m.start) #hard copy
+				goalPath.reverse()
 				depthLimit = len(goalPath) - 1 #no need to search deeper blocks
 				if keepSearch:
 					continue
-				return (blockCount, goalPath, maxDepth)
+				return (blockCount, goalPath, maxFirngeSize)
 			else:
 				closed[temp] = tempDepth
 			#expand block
@@ -116,21 +126,24 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 					random.shuffle(tempFringe)
 				for nextTemp in tempFringe:
 					if quickGoal and nextTemp == m.goal:
+						prev[nextTemp] = temp
 						blockCount = blockCount + 1
-						tempPath.append(m.goal)
-						tempDepth = len(tempPath)
-						if tempDepth > maxDepth:
-							maxDepth = tempDepth
-						goalPath = tempPath.copy() #hard copy
-						return (blockCount, goalPath, maxDepth)
+						if tempDepth+1 > maxDepth:
+							maxDepth = tempDepth+1
+						goalPath = getPath(nextTemp, prev, m.start)
+						goalPath.reverse()
+						return (blockCount, goalPath, maxFirngeSize)
 					if checkFringe:
 						if closed[nextTemp] == 0 or closed[nextTemp] > tempDepth + 1:
 							closed[nextTemp] = tempDepth + 1
 						else:
 							continue
-					fringe.extend(['pop', nextTemp])
+					prev[nextTemp] = temp
+					fringe.append((nextTemp, tempDepth+1))
+			if len(fringe) > maxFirngeSize:
+				maxFirngeSize = len(fringe)
 		#failed, no path
-		return (blockCount, goalPath, maxDepth)
+		return (blockCount, goalPath, maxFirngeSize)
 
 	#check input
 	if IDDFS and keepSearch:
@@ -144,10 +157,10 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	if IDDFS:
 		totalCount = 0
 		for depthLimit in itertools.count(1):
-			count, path, maxDepth = DFSCore(m, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
+			count, path, maxFirngeSize = DFSCore(m, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
 			totalCount = totalCount + count
 			if path or maxDepth < depthLimit:
-				return (totalCount, path, maxDepth)
+				return (totalCount, path, maxFirngeSize)
 	else:
 		return DFSCore(m, keepSearch = keepSearch, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
 
@@ -165,39 +178,33 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 	#int blockCount in [1 : inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
 	#int maxDepth in [1 : inf]: the max depth of explored blocks
-	
-	def getPath(temp, prev, goal):
-		path = []
-		while temp != goal:
-			path.append(temp)
-			temp = tuple(prev[temp])
-		return path + [goal]
 
 	sPath = []
 	sFringe = []
 	sClosed = np.zeros_like(m.wall, dtype = np.uint32)
 	sPrev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
+	sFringeSize = 1
 	gPath = []
 	gFringe = []
 	gClosed = np.zeros_like(m.wall, dtype = np.uint32)
 	gPrev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
+	gFringeSize = 1
 	blockCount = 0
 	maxDepth = 0
+	maxFirngeSize = 2
 	#init fringe
 	sFringe.append(m.start)
 	sPrev[m.start] = m.start
 	gFringe.append(m.goal)
 	gPrev[m.goal] = m.goal
-	#prepare BDDFS
+	#prepare BDBFS
 	tempPath = [sPath, gPath]
 	fringe = [sFringe, gFringe]
 	closed = [sClosed, gClosed]
 	prev = [sPrev, gPrev]
 	goal = [m.goal, m.start]
-	if BDBFS:
-		direction = 2
-	else:
-		direction = 1
+	fringeSize = [sFringeSize, gFringeSize]
+	direction = 1 + int(BDBFS)
 	#core
 	while sFringe and gFringe:
 		for i in range(direction):
@@ -210,7 +217,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 				sPath.reverse()
 				if not BDBFS:
 					maxDepth = maxDepth + 1
-				return (blockCount, sPath[:-1] + gPath, maxDepth)
+				return (blockCount, sPath[:-1] + gPath, maxFirngeSize - int(not BDBFS))
 			else:
 				closed[i][temp] = closed[i][tuple(prev[i][temp])] + 1
 				if closed[i][temp] > maxDepth:
@@ -235,7 +242,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 							sPath.reverse()
 							if not BDBFS:
 								maxDepth = maxDepth + 1
-							return (blockCount, sPath[:-1] + gPath, maxDepth)
+							return (blockCount, sPath[:-1] + gPath, maxFirngeSize - int(not BDBFS))
 					if checkFringe:
 						if closed[i][nextTemp] == 0:
 							closed[i][nextTemp] = closed[i][temp] + 1
@@ -243,15 +250,31 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 							continue
 					fringe[i].append(nextTemp)
 					prev[i][nextTemp] = temp
+			#update fringe size
+			fringeSize[i] = len(fringe[i])
+			if fringeSize[0] + fringeSize[1] > maxFirngeSize:
+				maxFirngeSize = fringeSize[0] + fringeSize[1]
 	#failed, no path
-	return (blockCount, sPath+gPath, maxDepth)
+	return (blockCount, sPath + gPath, maxFirngeSize - int(not BDBFS))
 
 
 if __name__ == '__main__':
-	M = buildUp(size = 128, p = 0.2)
-	M.visualize(size = 10)
-	count, path, maxDepth = BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
+	M = buildUp(size = 16, p = 0.2)
+#	M.visualize(size = 10)
+#	count, path, maxFirnge = BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
+#	print(count)
+#	print(path)
+#	print(len(path))
+#	print(maxFirnge)
+#	M.path = path
+#	img = M.visualize()
+	count, path, maxFirnge = DFS(M, quickGoal = True, randomWalk = True)
 	print(count)
 	print(path)
 	print(len(path))
-	print(maxDepth)
+	print(maxFirnge)
+	M.path = path
+	img = M.visualize()
+	path = 'D:/Users/endle/Desktop/520/'
+	name = 'maze.png'
+#	img.save(path+name, 'PNG')

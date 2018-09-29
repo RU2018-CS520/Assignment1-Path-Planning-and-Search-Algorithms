@@ -3,6 +3,7 @@ import queue
 import numpy as NP
 import math
 import solution
+import astar
 
 dir = [[-1, 0], [1, 0], [0, -1], [0, 1]] #directions of moving, respectively up, down, left, right
 
@@ -57,7 +58,7 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True):
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
-	#int routeLength: the length of the route from start to goal
+	#int maxFringeSize in [1, inf]: the max size of fringe
 	size = m.rows
 	sFringe = queue.PriorityQueue()
 	gFringe = queue.PriorityQueue()
@@ -73,6 +74,7 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True):
 	fullGoalPath = []
 	routeLength = 0
 	doneFlag = False
+	maxFringeSize = 2
 
 	sFringe.put(((distFunction(m.start, m.goal), blockCount), m.start, 1))
 	gFringe.put(((distFunction(m.goal, m.start), blockCount), m.goal, 1))
@@ -120,18 +122,20 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True):
 				cost = distFunction(nextPos, goal[d]) + stepcnt + 1
 				fringe[d].put(((cost, blockCount), nextPos, stepcnt + 1))
 				lastPos[d][nx, ny] = (x, y)
+			#update fringe size
+			fringeSize = sFringe.qsize() + gFringe.qsize()
+			if fringeSize > maxFringeSize:
+				maxFringeSize = fringeSize
 
-	return (abs(blockCount), fullGoalPath, routeLength)
+	return (abs(blockCount), fullGoalPath, maxFringeSize)
 
 if __name__ == '__main__':
-	M = buildUp(size = 128, p = 0.35)
+	M = buildUp(size = 64, p = 0.35)
 	t1 = biDirectionalAStar(m = M, distFunction = euclideanDist, LIFO = True)
-
 	t3 = biDirectionalAStar(m = M, distFunction = manhattanDist, LIFO = True)
-
 	t5 = biDirectionalAStar(m = M, distFunction = chebyshevDist, LIFO = True)
-
 	t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
+	t9 = astar.aStar(m = M, distFunction = chebyshevDist, LIFO = True)
 	print(str(t1[0]) + ", " + str(t1[2]))
 
 	print(str(t3[0]) + ", " + str(t3[2]))
@@ -140,9 +144,10 @@ if __name__ == '__main__':
 
 	l = len(t7[1])
 	print(str(t7[0]) + ", " + str(l))
+	print(str(t9[0]) + ", " + str(t9[2]))
 	M.path = t3[1]
-	imgastar = M.visualize()
+#	imgastar = M.visualize()
 	M.path = t7[1]
-	imgbfs = M.visualize()
-#    imgastar.save('/home/shengjie/astar.png', 'PNG')
-#    imgbfs.save('/home/shengjie/bfs.png', 'PNG')
+#	imgbfs = M.visualize()
+#	imgastar.save('/home/shengjie/astar.png', 'PNG')
+#	imgbfs.save('/home/shengjie/bfs.png', 'PNG')
