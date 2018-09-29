@@ -58,7 +58,7 @@ img.save(path+name, 'PNG')
 ```
 
 ## solution
-a number of algorithms to solve the maze, including Deep First Search, Breadth First Search, and their variants.
+a number of algorithms to solve the maze, including Depth-First Search, Breadth-First Search, and their variants.
 
 ### DFS()
 **input args:**
@@ -93,7 +93,7 @@ bool checkFringe:
 ```
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks has opened, used to measure how hard the maze is
+int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
@@ -177,7 +177,7 @@ int depthLimit in [1 : inf]:
 
 **return vals:**
 ```
-int blockCount in [1 : inf]: the number of blocks has opened, used to measure how hard the maze is
+int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
 ```
@@ -222,4 +222,28 @@ BFS (today's special)
 import solution
 m = solution.buildUp()
 count, path, depth = solution.BFS(m, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True) #because it is coooooooooooool
+```
+
+## astar.py  
+### aStar(m, distFunction, LIFO)  
+**input args**  
+```
+class maze m: Maze to be solved.  
+function distFunction: The function of distance calculation astar is going to use. The default distFunction is manhattanDist. Other choices include euclideanDist and chebyshevDist.  
+bool LIFO: Enable Last-In-First-Out priority queue if LIFO is set to True.  
+```
+**return vals**
+```
+int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
+list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
+int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
+```
+**usage:**  
+In the input arguments, distFunction could be **euclideanDist**, **manhattanDist** and **chebyshevDist**. LIFO could be **True** or **False**.  
+The following code is a sample of astar using euclideanDist and not using LIFO.
+```
+import astar
+
+m = astar.buildUp(size = 128, p = 0.35)
+blockCount, goalPath, maxFringe = astar.astar(m, distFunction = euclideanDist, LIFO = False)
 ```
