@@ -84,7 +84,7 @@ bool randomWalk:
 	False: priority: strictly R > D > L > U, seems effective in this diagonal maze
 bool randomWalkPlus: 
 	True: totally random, no priority. may be effictive when maze.build(randomPosition)
-		Caution: force randomWalk = True
+		CAUTION: force randomWalk = True
 	False: depend on randomWalk
 bool checkFringe:
 	True: besides closed set, keep fringe distinct. to some extent, return a shorter path, but not definitely shortest; 
@@ -95,7 +95,7 @@ bool checkFringe:
 ```
 int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
-int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
+int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
 
 **usage:**
@@ -166,7 +166,7 @@ bool randomWalk:
 	False: priority: strictly R > D > L > U, seems effective in this diagonal maze
 bool randomWalkPlus: 
 	True: totally random, no priority. may be effective when maze.build(randomPosition)
-		Caution: force randomWalk = True
+		CAUTION: force randomWalk = True
 	False: depend on randomWalk
 bool checkFringe:
 	True: besides closed set, keep fringe distinct. faster
@@ -179,7 +179,7 @@ int depthLimit in [1 : inf]:
 ```
 int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
-int maxDepth in [1 : inf]: the max depth of explored blocks, another way to measure how hard the maze is
+int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
 
 **usage:**
@@ -246,4 +246,94 @@ import astar
 
 m = astar.buildUp(size = 128, p = 0.35)
 blockCount, goalPath, maxFringe = astar.astar(m, distFunction = euclideanDist, LIFO = False)
+```
+
+## bdastar
+a variant of A\*, Bi-Directional A\*, seems **not optimal**
+
+### biDirectionalAStar()
+see *description.astar.aStar()*
+
+## test
+a brunch of functions used to test algorithms
+
+### mazeFactory()
+**input args:**
+```
+int num in [1 : inf]: the number of mazes in the test list
+int size in [2 : inf]: maze width and height
+float p in [0 : 1]: probablity of a block becomes a wall
+	CAUTION: a too big p could cause endless loop
+function initFunction: init walls, None default trivalInit()
+bool randomPosition: 
+	True: randomlize start and goal position
+	False: start at upper left and goal at lower right
+```
+**return val:**
+```
+list mazeList with element class maze: test set of mazes
+```
+
+**usage:**
+
+create 10 mazes
+```
+import test
+mazeList = test.mazeFactory(num = 10, size = 16, p = 0.2)
+```
+
+### timer()
+**input args:**
+```
+list mazeList with element class maze: test set of mazes
+function solutionFunction: algorithms to be tested
+dict solutionConfig: configuration of solutionFunction. see each algorithm's input args and usage
+```
+**return vals:**
+```
+list countList with element int blockCount: the number of blocks have opend in each maze
+list pathList with element int pathLength: the length of path returned in each maze
+list fringeList with element int maxFringeSize: the max size of fringe in each maze
+float totalTime: the total time spend for solving all the mazes
+```
+
+**usage**
+
+test BDA* with manhattanDist
+```
+from bdastar import aStar, manhattanDist
+import test
+mazeList = test.mazeFactory(num = 10, size = 16, p = 0.2)
+config = {'distFunction' : manhattanDist, 'LIFO' : True}
+countList, pathList, depthList, totalTime = test.timer(mazeList = mazeList, solutionFunction = BDAStar, solutionConfig = config)
+
+```
+
+## saveMaze() & loadMaze
+**input args:**
+```
+str path: saved file path. REMEMBER: end with a slash
+str name: saved file name
+```
+**input arg** ***OR*** **return val:**
+```
+list mazeList with element class maze: test set of mazes. acturally, can be anything
+```
+
+**usage:**
+
+save something
+```
+import test
+mazeList = mazeFactory()
+path = 'D:/Users/endle/Desktop/520/'
+name = 'mazeList.pkl'
+test.saveMaze(mazeList, path, name)
+```
+load something
+```
+import test
+path = 'D:/Users/endle/Desktop/520/'
+name = 'mazeList.pkl'
+mazeList = loadMaze(path, name)
 ```
