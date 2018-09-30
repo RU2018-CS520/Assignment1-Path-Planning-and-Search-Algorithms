@@ -2,7 +2,7 @@ import numpy as np
 
 import frame
 from bdastar import biDirectionalAStar as BDAStar, euclideanDist, manhattanDist, chebyshevDist
-from test import mazeFactory
+from test import mazeFactory as mFty
 
 class objectiveFunction(object):
 	"""docstring for objectiveFunction"""
@@ -15,9 +15,11 @@ class objectiveFunction(object):
 		self.solutionFunction = solutionFunction
 		self.solutionConfig = solutionConfig
 		self.deRandom = deRandom
+		return
 
 	def __call__(self, maze):
 		#class frame.maze or list maze with element frame.maze: maze to be evaluate
+
 		def evaluate(m, w, solutionFunction, solutionConfig, deRandom):
 			if isinstance(m, frame.maze):
 				block, path, fringe = solutionFunction(m, **solutionConfig)
@@ -41,6 +43,53 @@ class objectiveFunction(object):
 			return resultList
 		else:
 			return evaluate(maze, self.w, self.solutionFunction, self.solutionConfig, self.deRandom)
+
+class neighbor(object):
+	"""docstring for neighbor"""
+	def __init__(self, size = 4, mutationP = 0.001, mutationFunction = None, mutationConfig = None):
+		self.size = size
+		self.mutationP = mutationP
+		self.mutationFunction = mutationFunction
+		self.mutationConfig = mutationConfig
+
+	def __call__(self, maze, validate = False):
+		#class frame.maze or list maze with element frame.maze: maze to be evaluate
+		#bool validate: True: keep neighbor solvable, CAUTION: may cause endless loop; False: neighbor can be unsolvable
+
+		def mutation(m, mutationP, mutationFunction, mutationConfig, validate):
+
+			def trivalMutation(m, mutationP, validate):
+				mutationMatrix = np.random.rand(m.shape) < mutationP
+				return m.wall ^ mutationMatrix
+
+			if isinstance(m, frame.maze):
+				newMazeList = []
+				count = 0
+				while count < size:
+					if mutationFunction is None:
+						wall = trivalMutation(m, mutationP)
+					else:
+						#TODO: other mutationFunction
+						pass
+					newMaze = frame.maze(m.rows, m.cols, m.p, m.rootNumber)
+					newMaze.build(initFunction = frame.maze.build.setWall, initConfig = {'wall': wall})
+					if validate and not mFty.valid(newMaze):
+						continue
+					newMazeList.append(newMaze)
+					count = count + 1
+				return newMazeList
+			else:
+				print('E: localSearch.neighbor.__call__(), not a maze input')
+				exit()
+
+		if isinstance(maze, list) or isinstance(maze, tuple):
+			neighborList = []
+			for m in maze:
+				resultList.extend(mutation(m, self.mutationP, self.mutationFunction, self.mutationConfig, self.validate))
+			return neighborList
+		else:
+			return mutation(m, self.mutationP, self.mutationFunction, self.mutationConfig, self.validate))
+		
 
 def beamSearch(mList, teleportLimit = 0, maxIteration = 100, temperature, ):
 	pass
