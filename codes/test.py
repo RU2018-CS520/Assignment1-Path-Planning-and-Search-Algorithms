@@ -7,7 +7,8 @@ import timeit
 import pickle as pkl
 
 def valid(m):
-	return BDAStar(m = m, distFunction = manhattanDist, LIFO = True)[1]
+	m.solvable = bool(BDAStar(m = m, distFunction = manhattanDist, LIFO = True)[1])
+	return m.solvable
 
 def mazeFactory(num = 10, size = 128, p = 0.2, initFunction = None, randomPosition = False):
 	#INPUT ARGS:

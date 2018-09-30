@@ -28,8 +28,12 @@ class objectiveFunction(object):
 						block, path, fringe = solutionFunction(m, **solutionConfig)
 						result = np.min((result, np.sum(np.asarray((block, len(path), fringe)) * np.asarray(w))))
 						deRandom = int(deRandom) - 1
+					m.score = result
+					m.solvable = True
 					return result
 				else:
+					m.score = 0
+					m.solvable = False
 					return 0
 			else:
 				print('E: localSearch.objectiveFunction.__call__(), not a maze input')
@@ -49,7 +53,7 @@ class neighbor(object):
 		#float mutationP in [0, 1]: probablity of mutation
 		#function mutationFunction: algorithm to generate neighbor maze
 		#dict mutationConifg: configuration of mutationFunction
-		
+
 		self.size = size
 		self.mutationP = mutationP
 		self.mutationFunction = mutationFunction
@@ -94,7 +98,7 @@ class neighbor(object):
 			return mutation(maze, self.mutationP, self.mutationFunction, self.mutationConfig, validate)
 		
 
-def beamSearch(mList, teleportLimit = 0, maxIteration = 100, temperature = 0):
+def beamSearch(mList, teleportLimit = 0, maxIteration = 100, temperature = 0, cool, ):
 	pass
 
 if __name__ == '__main__':
