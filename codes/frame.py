@@ -3,9 +3,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PIL import Image, ImageChops
 
+def setWall(maze, wall):
+	maze.wall = wall
+	return
 
 class maze(object):
-	def __init__(self, rows = 10, cols = 10, p = 0.2):
+	def __init__(self, rows = 10, cols = 10, p = 0.2, rootNum = 0):
 		#int rows in [2 : inf]: maze width
 		#int cols in [2 : inf]: maze height
 		#float p in [0 : 1]: probablity of a block becomes a wall
@@ -15,18 +18,18 @@ class maze(object):
 		self.wall = np.zeros((rows, cols), dtype = np.bool)
 		self.path = None
 		self.isBuilt = False
+		self.rootNum = rootNum
+		return
 
 
-	def build(self, initFunction = None, randomPosition = False, force = False):
+	def build(self, randomPosition = False, force = False, initFunction = None, initConifg = None):
 		#function initFunction: init walls, None default trivalInit()
 		#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
 		#bool force: True: force to rebuild maze; False: if maze.isBuilt immediately return original maze
 		
 		def trivalInit(maze):
-			for row in range(maze.rows):
-				for col in range(maze.cols):
-					if random.random() < maze.p:
-						maze.wall[row, col] = True
+			maze.wall = np.random.rand(maze.rows, maze.cols) < maze.p
+			return
 
 		if self.isBuilt:
 			if force:
@@ -37,6 +40,8 @@ class maze(object):
 		#init walls
 		if initFunction is None:
 			trivalInit(self)
+		elif initFunction is setWall:
+			setWall(self, **initConifg)
 		else:
 			#TODO: process other init function
 			pass
@@ -137,7 +142,7 @@ class maze(object):
 		return img
 
 if __name__ == '__main__':
-	M = maze(128, 128, 0.2)
+	M = maze(10, 10, 0.2)
 	M.build()
 	img = M.visualize()
 	path = 'D:/Users/endle/Desktop/520/'
