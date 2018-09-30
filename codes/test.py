@@ -6,6 +6,9 @@ from bdastar import biDirectionalAStar as BDAStar
 import timeit
 import pickle as pkl
 
+def valid(m):
+	return BDAStar(m = m, distFunction = manhattanDist, LIFO = True)[1]
+
 def mazeFactory(num = 10, size = 128, p = 0.2, initFunction = None, randomPosition = False):
 	#INPUT ARGS:
 	#int num in [1 : inf]: the number of mazes in the test list
@@ -15,9 +18,6 @@ def mazeFactory(num = 10, size = 128, p = 0.2, initFunction = None, randomPositi
 	#bool randomPosition: True: randomlize start and goal position; False: start at upper left and goal at lower right
 	#RETURN VALS:
 	#list mazeList with element class maze: test set of mazes
-	
-	def valid(m):
-		return BDAStar(m = m, distFunction = manhattanDist, LIFO = True)[1]
 	
 	mazeList = []
 	i = 0
@@ -71,13 +71,13 @@ def loadMaze(path, name):
 	return mazeList
 
 if __name__ == '__main__':
-	mazeList = mazeFactory(num = 10, size = 16, p = 0.2)
+	mazeList = mazeFactory(num = 10, size = 30, p = 0.3)
 	path = 'D:/Users/endle/Desktop/520/'
 	name = 'mazeList.pkl'
 #	saveMaze(mazeList, path, name)
 #	mazeList = loadMaze(path, name)
-	config = {'distFunction' : manhattanDist, 'LIFO' : True}
-	countList, pathList, depthList, totalTime = timer(mazeList = mazeList, solutionFunction = BDAStar, solutionConfig = config)
+	config = {}
+	countList, pathList, depthList, totalTime = timer(mazeList = mazeList, solutionFunction = BFS, solutionConfig = config)
 	print(countList)
 	print(pathList)
 	print(depthList)
