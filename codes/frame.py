@@ -19,6 +19,8 @@ class maze(object):
 		self.path = None
 		self.isBuilt = False
 		self.rootNum = rootNum
+		self.solvable = False
+		self.score = -1
 		return
 
 
