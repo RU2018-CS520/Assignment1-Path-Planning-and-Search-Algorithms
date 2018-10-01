@@ -23,6 +23,9 @@ class maze(object):
 		self.score = -1
 		return
 
+	def __le__(self, other):
+		return self.score > other.score
+
 
 	def build(self, randomPosition = False, force = False, initFunction = None, initConifg = None):
 		#function initFunction: init walls, None default trivalInit()
@@ -76,15 +79,15 @@ class maze(object):
 					image[row*size : row*size+grid+1, :, :] = beacon
 					image[row*size+size-grid-1 : row*size+size, :, :] = beacon
 				else:
-					image[row*size : row*size+grid+1, :, :] = color
-					image[row*size+size-grid-1 : row*size+size, :, :] = color
+					image[row*size : row*size+grid, :, :] = color
+					image[row*size+size-grid : row*size+size, :, :] = color
 
 			for col in range(self.cols):
 				if not bool(col%distance): #beacon
 					image[:, col*size : col*size+grid+1, :] = beacon
-					image[:, col*size+size-grid : col*size+size, :] = beacon
+					image[:, col*size+size-grid-1 : col*size+size, :] = beacon
 				else:
-					image[:, col*size : col*size+grid+1, :] = color
+					image[:, col*size : col*size+grid, :] = color
 					image[:, col*size+size-grid : col*size+size, :] = color
 
 		if outerPath:
