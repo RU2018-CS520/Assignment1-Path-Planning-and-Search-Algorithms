@@ -21,6 +21,8 @@ class objectiveFunction(object):
 
 		def evaluate(m, w, solutionFunction, solutionConfig, deRandom):
 			if isinstance(m, frame.maze):
+				if m.score != -1:
+					return m.score
 				block, path, fringe = solutionFunction(m, **solutionConfig)
 				if path:
 					result = np.sum(np.asarray((block, len(path), fringe)) * np.asarray(w))
@@ -106,6 +108,7 @@ if __name__ == '__main__':
 	sc = {'LIFO': True, 'distFunction' : manhattanDist}
 	nb = neighbor(size = 2, mutationP = 0.02)
 	newMaze = nb([a,b], validate = True)
+	newMaze[1].score = 10000
 	of = objectiveFunction([1,1,1], sf, sc, deRandom = 2)
 	print(newMaze)
 	for m in newMaze:
