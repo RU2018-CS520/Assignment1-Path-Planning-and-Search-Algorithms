@@ -19,6 +19,8 @@ class maze(object):
 		self.path = None
 		self.isBuilt = False
 		self.rootNum = rootNum
+		self.solvable = False
+		self.score = -1
 		return
 
 
@@ -147,4 +149,4 @@ if __name__ == '__main__':
 	img = M.visualize()
 	path = 'D:/Users/endle/Desktop/520/'
 	name = 'maze.png'
-	img.save(path+name, 'PNG')
+#	img.save(path+name, 'PNG')
