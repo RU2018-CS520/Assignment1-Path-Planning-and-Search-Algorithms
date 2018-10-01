@@ -21,6 +21,8 @@ class objectiveFunction(object):
 
 		def evaluate(m, w, solutionFunction, solutionConfig, deRandom):
 			if isinstance(m, frame.maze):
+				if m.score != -1:
+					return m.score
 				block, path, fringe = solutionFunction(m, **solutionConfig)
 				if path:
 					result = np.sum(np.asarray((block, len(path), fringe)) * np.asarray(w))
@@ -39,7 +41,7 @@ class objectiveFunction(object):
 				print('E: localSearch.objectiveFunction.__call__(), not a maze input')
 				exit()
 		
-		if isinstance(maze, list) or isinstance(maze, tuple):
+		if isinstance(maze, (list, tuple)):
 			resultList = []
 			for m in maze:
 				resultList.append(evaluate(m, self.w, self.solutionFunction, self.solutionConfig, self.deRandom))
@@ -89,17 +91,13 @@ class neighbor(object):
 				print('E: localSearch.neighbor.__call__(), not a maze input')
 				exit()
 
-		if isinstance(maze, list) or isinstance(maze, tuple):
+		if isinstance(maze, (list, tuple)):
 			neighborList = []
 			for m in maze:
 				neighborList.extend(mutation(m, self.mutationP, self.mutationFunction, self.mutationConfig, validate))
 			return neighborList
 		else:
 			return mutation(maze, self.mutationP, self.mutationFunction, self.mutationConfig, validate)
-		
-
-def beamSearch(mList, teleportLimit = 0, maxIteration = 100, temperature = 0, cool, ):
-	pass
 
 if __name__ == '__main__':
 	a = frame.maze(rootNum = 1)
@@ -110,6 +108,7 @@ if __name__ == '__main__':
 	sc = {'LIFO': True, 'distFunction' : manhattanDist}
 	nb = neighbor(size = 2, mutationP = 0.02)
 	newMaze = nb([a,b], validate = True)
+	newMaze[1].score = 10000
 	of = objectiveFunction([1,1,1], sf, sc, deRandom = 2)
 	print(newMaze)
 	for m in newMaze:
