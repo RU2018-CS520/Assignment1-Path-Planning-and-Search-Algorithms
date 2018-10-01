@@ -76,7 +76,7 @@ class Population:
         return m
 
     def nextGeneration(self, pop):
-        chosenRate = 0.2
+        chosenRate = 0.1
         chosenOnes = int(self.populationSize * chosenRate)
         survive = int(self.populationSize * (self.reproductionRate - chosenRate)) # can use other methods to decide which individual survive
         nextPop = pop[:(self.populationSize - survive)]
@@ -124,7 +124,8 @@ class Population:
                 tempFitness, tempIndividual = printFitness(pop)
                 if tempFitness > maxFitness:
                     maxFitness, individualWithMaxFitness = tempFitness, tempIndividual
-        individualWithMaxFitness.visualize()
+        #individualWithMaxFitness.visualize()
+        return individualWithMaxFitness
 
 
 class TestGeneticAlgorithm(unittest.TestCase):
@@ -164,9 +165,9 @@ class TestGeneticAlgorithm(unittest.TestCase):
         printFitness(nextGeneration)
 
     def testIteration(self):
-        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 300,
+        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 1000,
                        maxIteration = 101, reproductionRate = 0.7, mutationRate
-                       = 0.15, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
+                       = 0.2, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
         p.iterate()
 
 def buildUp(mazeSize, mazeWallRate):
