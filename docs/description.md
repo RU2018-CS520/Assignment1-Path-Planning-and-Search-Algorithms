@@ -14,6 +14,10 @@ list path with element (row, col): a path from S to G. None or [] if not exist
 (row, col) start: start point, default (0, 0)
 (row, col) goal: destination, default (rows-1, cols-1)
 bool isBuilt: True: has built up walls, do NOT build it again; False: empty maze, call function build() before solove it
+int rootNum in [0 : inf]: record of the root, used in beam search
+bool solvable: True: there must be a path. False: no path or untested(check maze.score)
+int or float score in [0 : inf]: objectiveFunction(maze)
+class maze teleported: previous root maze, used in beamAnneal. last for only 1 generation
 ```
 
 **member funcs:**
@@ -50,11 +54,17 @@ import solution
 m = frame.maze()
 m.build()
 count, path, depth = solution.DFS(m)
-m.path = path
-img = m.visualize(size = 10, grid = 1)
-path = 'D:/Users/endle/Desktop/520/'
-name = 'maze.png'
-img.save(path+name, 'PNG')
+img = m.visualize(size = 10, grid = 1, outerPath = path)
+iPath = 'D:/Users/endle/Desktop/520/'
+iName = 'maze.png'
+img.save(iPath+iName, 'PNG')
+```
+build with setWall
+```
+import frame
+m = frame.maze()
+wall = foobar() #see neighbor
+m.build(initFunction = frame.setWall, initConifg = {'wall' : wall})
 ```
 
 ## solution
@@ -93,7 +103,7 @@ bool checkFringe:
 ```
 **return vals:**
 ```
-int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
+int blockCount in [1 : inf]: The number of blocks has been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
@@ -177,7 +187,7 @@ int depthLimit in [1 : inf]:
 
 **return vals:**
 ```
-int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
+int blockCount in [1 : inf]: The number of blocks has been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
@@ -231,10 +241,11 @@ count, path, depth = solution.BFS(m, BDBFS = True, quickGoal = True, randomWalk 
 class maze m: Maze to be solved.  
 function distFunction: The function of distance calculation astar is going to use. The default distFunction is manhattanDist. Other choices include euclideanDist and chebyshevDist.  
 bool LIFO: Enable Last-In-First-Out priority queue if LIFO is set to True.  
+	CAUTION: default is True
 ```
 **return vals**
 ```
-int blockCount in [1 : inf]: The number of blocks have been opened. A reference of how hard the maze is.
+int blockCount in [1 : inf]: The number of blocks has been opened. A reference of how hard the maze is.
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
@@ -291,7 +302,7 @@ dict solutionConfig: configuration of solutionFunction. see each algorithm's inp
 ```
 **return vals:**
 ```
-list countList with element int blockCount: the number of blocks have opend in each maze
+list countList with element int blockCount: the number of blocks has opend in each maze
 list pathList with element int pathLength: the length of path returned in each maze
 list fringeList with element int maxFringeSize: the max size of fringe in each maze
 float totalTime: the total time spend for solving all the mazes
@@ -309,7 +320,7 @@ countList, pathList, depthList, totalTime = test.timer(mazeList = mazeList, solu
 
 ```
 
-## saveMaze() & loadMaze
+### saveMaze() & loadMaze
 **input args:**
 ```
 str path: saved file path. REMEMBER: end with a slash
@@ -317,7 +328,7 @@ str name: saved file name
 ```
 **input arg** ***OR*** **return val:**
 ```
-list mazeList with element class maze: test set of mazes. acturally, can be anything
+list mazeList with element class maze: test set of mazes. actually, can be anything
 ```
 
 **usage:**
@@ -336,4 +347,97 @@ import test
 path = 'D:/Users/endle/Desktop/520/'
 name = 'mazeList.pkl'
 mazeList = loadMaze(path, name)
+```
+
+## localSearch
+some useful tools for local search
+
+### class objectiveFunction()
+**member vars:**
+```
+list w with element int or float len(w) = 3: weight
+function solutionFunction:
+dict solutionConfig: see description.solution, description.astar and description.bdastar
+bool or int deRandom: cast more test to get a min score
+```
+
+**usage:**
+get mazes' socre
+```
+import test
+import localSearch
+from bdastar import biDirectionalAStar as BDAStar, manhattanDist
+mList = test.mazeFactory()
+sf = BDAStar
+sc = {'LIFO': True, 'distFunction' : manhattanDist}
+obFn = localSearch.objectiveFunction([1,1,1], sf, sc)
+obFn(mList)
+```
+
+### class neighbor()
+**member vars:**
+```
+int size in [1 : inf]: 
+float mutationP in [0, 1]: 
+function mutationFunction: 
+dict mutationConifg:
+```
+
+**usage:**
+get mazes' neighbor
+```
+import test
+import localSearch
+mList = test.mazeFactory()
+nebr = neighbor(size = 2, mutationP = 0.02)
+newMaze = nebr(mList, validate = True)
+```
+
+## beamAnneal
+
+### beamAnneal()
+**input args:**
+```
+list maze with element frame.maze: init state maze
+class localSearch.objectiveFunction obFn: evaluate maze score
+class localSearch.neighbor nebr: generate maze's neighbor mazes
+int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 
+	0: auto-adapt; 
+	1: no teleport permission
+bool backTeleport: 
+	True: record before-teleporting maze to be able to teleport back; 
+	False: better is better, who cares losers
+int maxIteration in [1 : inf]: directly halt searching
+float temperature in [Tmin, inf]: control probability of simulated annealing, too small may cause early halt
+float coolRate in [0 : 1]: control temperature decreasing speed. the larger, the slower. 
+	1: disable simulate annealing
+float minT in [0 : inf]: another way halt searching
+int or float annealWeight in [0 : inf]: control probability of simulated annealing. the larger, the smaller.
+int or float annealBias in [0 : inf]: control probability of simulated annealing, especially when no effective mutation. the larger, the smaller
+int patience in [1 : inf]: the last way to halt searching when converged
+float impatientRate in [0 : inf]: control the number of converged iteration to cause a halt. the larger, the fewer. 
+	0: disable impatient converge halt
+int tempSave in [1 : inf]: save temp result to disk every tempSave iters, including mList, temperature, patience. 
+	0: no save
+str savePath: saved file path. REMEMBER: end with a slash
+```
+
+**return val:**
+```
+list maze with element frame.maze: final state maze
+```
+
+**usage:**
+```
+import test
+import localSearch as lS
+import beamAnneal as bA
+from solution import BFS
+mList = test.mazeFactory(num = 6, size = 32, p = 0.4)
+sF = BFS
+sC = {'BDBFS' : True, 'quickGoal' : True, 'randomWalk' : True, 'checkFringe' : True}
+obFn = lS.objectiveFunction(w = [0,1,0], solutionFunction = sF, solutionConfig = sC, deRandom = False)
+nebr = lS.neighbor(size = 33, mutationP = 0.02)
+sPath = 'D:/Users/endle/Desktop/520/log/'
+newMaze = bA.beamAnneal(mList, obFn = obFn, nebr = nebr, teleportLimit = 2, maxIteration = 100, temperature = 10000., coolRate = 0.92, minT = 0.1, annealWeight = 16384, annealBias = 8, patience = 100, impatientRate = 0.001, tempSave = 10, savePath = sPath)
 ```
