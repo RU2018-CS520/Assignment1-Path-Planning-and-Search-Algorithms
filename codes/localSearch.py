@@ -74,6 +74,9 @@ class neighbor(object):
 			if isinstance(m, frame.maze):
 				newMazeList = []
 				count = 0
+				if m.teleported:
+					newMazeList.append(m.teleported)
+					count = count + 1
 				while count < self.size:
 					if mutationFunction is None:
 						wall = trivalMutation(m, mutationP, validate)
