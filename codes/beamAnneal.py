@@ -10,10 +10,12 @@ from solution import BFS, DFS
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 from bdastar import biDirectionalAStar as BDAStar
 
-def beamAnneal(mList, obFn, nebr, teleportLimit = 0, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001):
+def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001):
 	#list maze with element frame.maze: init state maze
 	#class localSearch.objectiveFunction obFn: evaluate maze score
 	#class localSearch.neighbor nebr: generate maze's neighbor maze
+	#int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 0: auto-adaptp; 1: no teleport premission
+	#bool backTeleport: True: record before-teleporting maze to be able teleport back; False: better is batter, who cares losers
 	#int maxIteration in [1 : inf]: directly halt searching
 	#float temperature in [Tmin, inf]: control probability of simulate annealing, too small may cause early halt
 	#float coolRate in [0 : 1]: control temperature decreasing speed. the larger, the slower. 1: disable simulate annealing
@@ -22,6 +24,7 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, maxIteration = 100, tempera
 	#int or float annealBias in [0 : inf]: control probablity of simulate annealing, especially when no effective mutation. the larger, the smaller
 	#int patience in [1 : inf]: the last way to halt searching when converged
 	#float impatientRate in [0 : inf]: control the number of converged iteration to cause a halt. the larger, the fewer. 0: disable impatient converge halt 
+
 	iterCount = 0
 	patienceDecrease = impatientRate
 	#prepare for beamSearch
@@ -30,6 +33,9 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, maxIteration = 100, tempera
 		mList[i].rootNum = i;
 	if teleportLimit == 0:
 		teleportLimit = int(np.ceil(len(mList) / 4))
+	#prepare for backTeleport
+	if backTeleport:
+		tempRoot = set(list(range(beamSize)))
 	print('start beamAnneal')
 	totalStart = timeit.default_timer()
 	#start search
@@ -50,16 +56,23 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, maxIteration = 100, tempera
 		nextList = []
 		noMove = True
 		fullBeam = False
+		if backTeleport:
+			nextRoot = set()
+			teleportList = []
 		#move to next
 		for i in index:
 			prevIndex = i // nebr.size
-			if nextScore[i] > tempScore[prevIndex] or (coolRate != 1 and random.random() < math.exp((annealWeight * (nextScore[i] - tempScore[prevIndex]) - annealBias) / temperature)):
+			if not fullBeam and (nextScore[i] > tempScore[prevIndex] or (coolRate != 1 and random.random() < math.exp((annealWeight * (nextScore[i] - tempScore[prevIndex]) - annealBias) / temperature))):
 				candidate = tempNext[i]
 				#full teleported agents
 				if not candidate.solvable:
 					continue
 				if rootCount[candidate.rootNum] == 0:
 					continue
+				if backTeleport:
+					nextRoot.add(candidate.rootNum)
+					if rootCount[candidate.rootNum] < teleportLimit: #teleported more than 1 agent
+						teleportList.append(candidate)
 				rootCount[candidate.rootNum] = rootCount[candidate.rootNum] - 1
 				nextList.append(candidate)
 				nextCount = nextCount + 1
@@ -67,7 +80,18 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, maxIteration = 100, tempera
 			#full beam
 			if nextCount == beamSize:
 				fullBeam = True
-				break
+				if not backTeleport:
+					break
+				else:
+					teleportRoot = tempRoot - nextRoot
+					if not teleportRoot or not teleportList:
+						break
+					if tempNext[i].rootNum in teleportRoot:
+						teleportList[-1].teleported = tempNext[i]
+						teleportRoot.discard(tempNext[i].rootNum)
+						teleportList.pop()
+		if backTeleport:
+			tempRoot = nextRoot
 		#add converged agents
 		if not fullBeam:
 			index = list(np.argsort(tempScore))
