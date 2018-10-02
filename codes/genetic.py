@@ -20,7 +20,7 @@ class Population:
         self.pop = []
         for i in range(self.populationSize):
             if self.mazeWallRate == -1:
-                wallRate = random.uniform(0.0, 0.3)
+                wallRate = random.uniform(0.1, 0.33)
             else:
                 wallRate = self.mazeWallRate
             m = buildUp(self.mazeSize, wallRate)
@@ -43,19 +43,34 @@ class Population:
         #mother.visualize()
         child = buildUp(self.mazeSize, 0.0)
         mid = random.randint(1, self.mazeSize)
-        reproductionType = random.randrange(2)
+        reproductionType = random.randrange(4)
         #reproductionType = 0
-        for i in range(mid):
-            if reproductionType == 0:
-                child.wall[:, i] = father.wall[:, i]
-            else:
-                child.wall[i, :] = father.wall[i, :]
+        if reproductionType == 2:
+            for i in range(self.mazeSize):
+                for j in range(self.mazeSize):
+                    if j > i:
+                        child.wall[i, j] = mother.wall[i, j]
+                    else:
+                        child.wall[i, j] = father.wall[i, j]
+        elif reproductionType == 3:
+            for i in range(self.mazeSize):
+                for j in range(self.mazeSize):
+                    if i + i + j + j > self.mazeSize:
+                        child.wall[i, j] = mother.wall[i, j]
+                    else:
+                        child.wall[i, j] = father.wall[i, j]
+        else:
+            for i in range(mid):
+                if reproductionType == 0:
+                    child.wall[:, i] = father.wall[:, i]
+                else:
+                    child.wall[i, :] = father.wall[i, :]
 
-        for i in range(mid, self.mazeSize):
-            if reproductionType == 0:
-                child.wall[:, i] = mother.wall[:, i]
-            else:
-                child.wall[i, :] = mother.wall[i, :]
+            for i in range(mid, self.mazeSize):
+                if reproductionType == 0:
+                    child.wall[:, i] = mother.wall[:, i]
+                else:
+                    child.wall[i, :] = mother.wall[i, :]
 
         #child.visualize()
         rollMutation = random.random()
@@ -117,8 +132,9 @@ class Population:
         maxFitness = -1
         individualWithMaxFitness = -1
         pop = self.pop
-        for iteration in range(self.maxIteration):
+        for iteration in range(self.maxIteration + 1):
             pop = self.nextGeneration(pop)
+            print('iteration: ' + repr(iteration) + ' - ' + repr(pop[0].score)) 
             if iteration % 10 == 0:
                 print('iteration: ' + repr(iteration))
                 tempFitness, tempIndividual = printFitness(pop)
@@ -165,10 +181,12 @@ class TestGeneticAlgorithm(unittest.TestCase):
         printFitness(nextGeneration)
 
     def testIteration(self):
-        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 1000,
-                       maxIteration = 101, reproductionRate = 0.7, mutationRate
-                       = 0.2, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
-        p.iterate()
+        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 2000,
+                       maxIteration = 1000, reproductionRate = 0.7, mutationRate
+                       = 0.1, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
+        finalChild = p.iterate()
+        finalChild.printMaze()
+        #finalChild.visualize()
 
 def buildUp(mazeSize, mazeWallRate):
     m = frame.maze(rows = mazeSize, cols = mazeSize, p = mazeWallRate)
