@@ -77,7 +77,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
 	#int maxDepth in [1 : inf]: the max depth of explored blocks
 	
-	def DFSCore(m, depthLimit = 0, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
+	def DFSCore(m, IDDFS = False, depthLimit = 0, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False):
 		#INPUT ARGS:
 		#int depthLimit in [1 : inf]: used in IDDFS to limit depth each iteration explores, 0 if not IDDFS
 		#OUTPUT ARGS: 
@@ -113,6 +113,8 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 				depthLimit = len(goalPath) - 1 #no need to search deeper blocks
 				if keepSearch:
 					continue
+				if IDDFS:
+					return (blockCount, goalPath, maxFirngeSize, maxDepth)
 				return (blockCount, goalPath, maxFirngeSize)
 			else:
 				closed[temp] = tempDepth
@@ -132,6 +134,8 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 							maxDepth = tempDepth+1
 						goalPath = getPath(nextTemp, prev, m.start)
 						goalPath.reverse()
+						if IDDFS:
+							return (blockCount, goalPath, maxFirngeSize, maxDepth)
 						return (blockCount, goalPath, maxFirngeSize)
 					if checkFringe:
 						if closed[nextTemp] == 0 or closed[nextTemp] > tempDepth + 1:
@@ -143,6 +147,8 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 			if len(fringe) > maxFirngeSize:
 				maxFirngeSize = len(fringe)
 		#failed, no path
+		if IDDFS:
+			return (blockCount, goalPath, maxFirngeSize, maxDepth)
 		return (blockCount, goalPath, maxFirngeSize)
 
 	#check input
@@ -156,8 +162,9 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	#core
 	if IDDFS:
 		totalCount = 0
+		prevCount = 0
 		for depthLimit in itertools.count(1):
-			count, path, maxFirngeSize = DFSCore(m, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
+			count, path, maxFirngeSize, maxDepth = DFSCore(m, IDDFS = IDDFS, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe)
 			totalCount = totalCount + count
 			if path or maxDepth < depthLimit:
 				return (totalCount, path, maxFirngeSize)
@@ -259,22 +266,22 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 
 
 if __name__ == '__main__':
-	M = buildUp(size = 16, p = 0.2)
-#	M.visualize(size = 10)
-#	count, path, maxFirnge = BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
-#	print(count)
-#	print(path)
-#	print(len(path))
-#	print(maxFirnge)
-#	M.path = path
-#	img = M.visualize()
-	count, path, maxFirnge = DFS(M, quickGoal = True, randomWalk = True)
+	M = buildUp(size = 25, p = 0.3)
+	M.visualize(size = 10)
+	count, path, maxFirnge = BFS(M, BDBFS = False, quickGoal = True, randomWalk = False, checkFringe = True)
 	print(count)
 	print(path)
 	print(len(path))
 	print(maxFirnge)
 	M.path = path
 	img = M.visualize()
-	path = 'D:/Users/endle/Desktop/520/'
-	name = 'maze.png'
+	# count, path, maxFirnge = DFS(M, quickGoal = True, randomWalk = True)
+	# print(count)
+	# print(path)
+	# print(len(path))
+	# print(maxFirnge)
+	# M.path = path
+	# img = M.visualize()
+	# path = 'D:/Users/endle/Desktop/520/'
+	# name = 'maze.png'
 #	img.save(path+name, 'PNG')
