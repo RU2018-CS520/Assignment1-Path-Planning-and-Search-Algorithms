@@ -4,8 +4,12 @@ from matplotlib import pyplot as plt
 from PIL import Image, ImageChops
 
 def setWall(maze, wall):
+	#class maze: maze to be built
+	#np.array wall with ndim = 2 dtype = np.bool: True: this block is a wall; False: accessible empty block
+	
 	maze.wall = wall
 	return
+
 
 class maze(object):
 	def __init__(self, rows = 10, cols = 10, p = 0.2, rootNum = 0):
@@ -13,6 +17,7 @@ class maze(object):
 		#int cols in [2 : inf]: maze height
 		#float p in [0 : 1]: probablity of a block becomes a wall
 		#int rootNum in [0 : inf]: record of the root, used in beam search
+		
 		self.rows = rows
 		self.cols = cols
 		self.p = p
@@ -90,6 +95,7 @@ class maze(object):
 			#np.array image with ndim = 2: output maze map image
 			#int color in [0 : 255]: grid color #TODO: adapt to chromatic image
 			#int beacon in [0 : 255]: beacon gird for every 64 blocks
+			
 			for row in range(self.rows):
 				if not bool(row%distance): #beacon
 					image[row*size : row*size+grid+1, :, :] = beacon
@@ -162,6 +168,7 @@ class maze(object):
 		plt.imshow(img)
 		plt.show() #TODO: non-block call
 		return img
+
 
 if __name__ == '__main__':
 	M = maze(32, 32, 0.2)
