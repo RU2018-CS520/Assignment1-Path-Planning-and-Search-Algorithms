@@ -21,6 +21,7 @@ class maze(object):
 		self.rootNum = rootNum
 		self.solvable = False
 		self.score = -1
+		self.teleported = None
 		return
 
 	def __lt__(self, other):
@@ -108,7 +109,7 @@ class maze(object):
 		if path:
 			sColor = [82, 172, 118]
 			gColor = [195, 239, 172]
-			beacon = [0, 0, 255]
+			beacon = [82, 158, 118]
 			distance = 32
 			rStart = sColor[0]
 			gStart = sColor[1]
@@ -121,12 +122,12 @@ class maze(object):
 				row = path[i][0]
 				col = path[i][1]
 				if not bool(i%distance):
-					image[row*size : row*size+size, col*size : col*size+size] = (beacon[0], beacon[1], beacon[2] - (i//distance)*2)
+					image[row*size : row*size+size, col*size : col*size+size] = beacon
 				else:
 					image[row*size : row*size+size, col*size : col*size+size] = (rStart+i*rDist//length, gStart+i*gDist//length, bStart+i*bDist//length)
 		else:
 			#start & goal
-			sgColor = [82, 172, 118]
+			sgColor = [82, 158, 118]
 			backColor = 0
 			for block in [self.start, self.goal]:
 				image[block[0]*size+grid : block[0]*size+size-grid, block[1]*size+grid : block[1]*size+size-grid, :] = sgColor
@@ -147,7 +148,7 @@ class maze(object):
 		return img
 
 if __name__ == '__main__':
-	M = maze(10, 10, 0.2)
+	M = maze(32, 32, 0.2)
 	M.build()
 	img = M.visualize()
 	path = 'D:/Users/endle/Desktop/520/'
