@@ -111,25 +111,47 @@ def aStar(m, distFunction = manhattanDist, LIFO = True):
 	return (abs(blockCount), goalPath, maxFringeSize)
 
 if __name__ == '__main__':
-	M = buildUp(size = 128, p = 0.10)
-	t1 = aStar(m = M, distFunction = euclideanDist, LIFO = True)
-	t2 = aStar(m = M, distFunction = euclideanDist, LIFO = False)
-	t3 = aStar(m = M, distFunction = manhattanDist, LIFO = True)
-	t4 = aStar(m = M, distFunction = manhattanDist, LIFO = False)
-	t5 = aStar(m = M, distFunction = chebyshevDist, LIFO = True)
-	t6 = aStar(m = M, distFunction = chebyshevDist, LIFO = False)
-	t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
-	print(str(t1[0]) + ", " + str(len(t1[1])) +', '+ str(t1[2]))
-	print(str(t2[0]) + ", " + str(len(t2[1])) +', '+ str(t2[2]))
-	print(str(t3[0]) + ", " + str(len(t3[1])) +', '+ str(t3[2]))
-	print(str(t4[0]) + ", " + str(len(t4[1])) +', '+ str(t4[2]))
-	print(str(t5[0]) + ", " + str(len(t5[1])) +', '+ str(t5[2]))
-	print(str(t6[0]) + ", " + str(len(t6[1])) +', '+ str(t6[2]))
-	l = len(t7[1])
-	print(str(t7[0]) + ", " + str(l))
-	M.path = t1[1]
-	imgastar = M.visualize()
-	M.path = t7[1]
-	imgbfs = M.visualize()
+    for pp in NP.arange(0.1, 0.3, 0.05):
+        print(pp)
+        suma = 0.0
+        sumaa = 0.0
+        sume = 0.0
+        sumee = 0.0
+        for t in range(0, 10):
+            M = buildUp(size = 200, p = pp)
+            a, b, c = aStar(m = M, distFunction = euclideanDist, LIFO = True)
+            aa, bb, cc = aStar(m = M, distFunction = euclideanDist, LIFO =
+                               False)
+            e, f, g = aStar(m = M, distFunction = manhattanDist, LIFO = True)
+            ee, ff, gg = aStar(m = M, distFunction = manhattanDist, LIFO =
+                               False)
+            suma += a
+            sumaa += aa
+            sume += e
+            sumee += ee
+        print(suma / 10)
+        print(sumaa / 10)
+        print(sume / 10)
+        print(sumee / 10)
+	#M = buildUp(size = 200, p = 0.25)
+	#t1 = aStar(m = M, distFunction = euclideanDist, LIFO = True)
+	##t2 = aStar(m = M, distFunction = euclideanDist, LIFO = False)
+	#t3 = aStar(m = M, distFunction = manhattanDist, LIFO = True)
+	##t4 = aStar(m = M, distFunction = manhattanDist, LIFO = False)
+	##t5 = aStar(m = M, distFunction = chebyshevDist, LIFO = True)
+	##t6 = aStar(m = M, distFunction = chebyshevDist, LIFO = False)
+	##t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
+	#print(str(t1[0]) + ", " + str(len(t1[1])) +', '+ str(t1[2]))
+	#print(str(t2[0]) + ", " + str(len(t2[1])) +', '+ str(t2[2]))
+	#print(str(t3[0]) + ", " + str(len(t3[1])) +', '+ str(t3[2]))
+	#print(str(t4[0]) + ", " + str(len(t4[1])) +', '+ str(t4[2]))
+	#print(str(t5[0]) + ", " + str(len(t5[1])) +', '+ str(t5[2]))
+	#print(str(t6[0]) + ", " + str(len(t6[1])) +', '+ str(t6[2]))
+	#l = len(t7[1])
+	#print(str(t7[0]) + ", " + str(l))
+	#M.path = t1[1]
+	#imgastar = M.visualize()
+	#M.path = t7[1]
+	#imgbfs = M.visualize()
 #	imgastar.save('/home/shengjie/astar.png', 'PNG')
 #	imgbfs.save('/home/shengjie/bfs.png', 'PNG')
