@@ -20,12 +20,16 @@ class Population:
         self.pop = []
         for i in range(self.populationSize):
             if self.mazeWallRate == -1:
-                wallRate = random.uniform(0.1, 0.33)
+                wallRate = random.uniform(0.15, 0.38)
             else:
                 wallRate = self.mazeWallRate
-            m = buildUp(self.mazeSize, wallRate)
-            m.score = self.computeFitness(m)
-            self.pop += [m]
+            while True:
+                m = buildUp(self.mazeSize, wallRate)
+                m.score = self.computeFitness(m)
+                if m.score == 0:
+                    continue
+                self.pop += [m]
+                break
         self.pop.sort()
 
     def computeFitness(self, m):
@@ -181,12 +185,12 @@ class TestGeneticAlgorithm(unittest.TestCase):
         printFitness(nextGeneration)
 
     def testIteration(self):
-        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 2000,
-                       maxIteration = 1000, reproductionRate = 0.7, mutationRate
-                       = 0.1, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
+        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 750,
+                       maxIteration = 130, reproductionRate = 0.7, mutationRate
+                       = 0.05, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
         finalChild = p.iterate()
-        finalChild.printMaze()
-        #finalChild.visualize()
+        #finalChild.printMaze()
+        finalChild.visualize()
 
 def buildUp(mazeSize, mazeWallRate):
     m = frame.maze(rows = mazeSize, cols = mazeSize, p = mazeWallRate)
