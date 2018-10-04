@@ -1,0 +1,1 @@
+{'mazeSize': 10, 'mazeWallRate': -1, 'populationSize': 300,'maxIteration': 150, 'reproductionRate': 0.7, 'mutationRate': 15, 'hugeMutation': 'True', 'weight': [0, 1, 0], 'solutionFunction': 'aStar', 'solutionConfig': {'LIFO': 'True', 'distFunction': 'manhattanDist'}}

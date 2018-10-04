@@ -6,7 +6,9 @@ from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 
 class Population:
 
-    def __init__(self, mazeSize, mazeWallRate, populationSize, maxIteration, reproductionRate, mutationRate, hugeMutation = False, weight = [1, 0, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist}):
+    def __init__(self, mazeSize, mazeWallRate, populationSize, maxIteration,
+                 reproductionRate, mutationRate, hugeMutation = False, weight =
+                 [1, 0, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist}):
         self.mazeSize = mazeSize
         self.mazeWallRate = mazeWallRate
         self.populationSize = populationSize
@@ -15,8 +17,10 @@ class Population:
         self.mutationRate = mutationRate
         self.hugeMutation = hugeMutation
         self.weight = weight
-        self.solutionFunction = solutionFunction
+        self.solutionFunction = globals()[solutionFunction]
         self.solutionConfig = solutionConfig
+        if 'distFunction' in solutionConfig:
+            self.solutionConfig['distFunction'] = globals()[solutionConfig['distFunction']]
         self.pop = []
         for i in range(self.populationSize):
             if self.mazeWallRate == -1:
