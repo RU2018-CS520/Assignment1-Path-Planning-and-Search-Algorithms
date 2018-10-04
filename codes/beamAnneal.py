@@ -14,17 +14,17 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIte
 	#list maze with element frame.maze: init state maze
 	#class localSearch.objectiveFunction obFn: evaluate maze score
 	#class localSearch.neighbor nebr: generate maze's neighbor mazes
-	#int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 0: auto-adaptp; 1: no teleport premission
-	#bool backTeleport: True: record before-teleporting maze to be able teleport back; False: better is batter, who cares losers
+	#int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 0: auto-adapt; 1: no teleport premission
+	#bool backTeleport: True: record before-teleporting maze to be able to teleport back; False: better is batter, who cares losers
 	#int maxIteration in [1 : inf]: directly halt searching
-	#float temperature in [Tmin, inf]: control probability of simulate annealing, too small may cause early halt
+	#float temperature in [Tmin, inf]: control probability of simulated annealing, too small may cause early halt
 	#float coolRate in [0 : 1]: control temperature decreasing speed. the larger, the slower. 1: disable simulate annealing
 	#float minT in [0 : inf]: another way halt searching
-	#int or float annealWeight in [0 : inf]: control probablity of simulate annealing. the larger, the smaller.
-	#int or float annealBias in [0 : inf]: control probablity of simulate annealing, especially when no effective mutation. the larger, the smaller
+	#int or float annealWeight in [0 : inf]: control probability of simulated annealing. the larger, the smaller.
+	#int or float annealBias in [0 : inf]: control probability of simulated annealing, especially when no effective mutation. the larger, the smaller
 	#int patience in [1 : inf]: the last way to halt searching when converged
 	#float impatientRate in [0 : inf]: control the number of converged iteration to cause a halt. the larger, the fewer. 0: disable impatient converge halt 
-	#int tempSave in [1 : inf]: save temp result to disk every tempSave iters, including mList, temperatue, patience. 0: no save
+	#int tempSave in [1 : inf]: save temp result to disk every tempSave iters, including mList, temperature, patiencee. 0: no save
 	#str savePath: saved file path. REMEMBER: end with a slash
 
 	iterCount = 0
@@ -139,8 +139,8 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIte
 
 if __name__ == '__main__':
 	mList = test.mazeFactory(num = 6, size = 32, p = 0.4)
-	sF = BFS
-	sC = {'BDBFS' : True, 'quickGoal' : True, 'randomWalk' : True, 'checkFringe' : True}
+	sF = aStar
+	sC = {'distFunction' : chebyshevDist}
 	obFn = lS.objectiveFunction(w = [0,1,0], solutionFunction = sF, solutionConfig = sC, deRandom = False)
 	nebr = lS.neighbor(size = 33, mutationP = 0.02)
 	sPath = 'D:/Users/endle/Desktop/520/log/'
