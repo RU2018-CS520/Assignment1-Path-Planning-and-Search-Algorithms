@@ -84,7 +84,7 @@ class neighbor(object):
 						#TODO: other mutationFunction
 						pass
 					newMaze = frame.maze(m.rows, m.cols, m.p, m.rootNum)
-					newMaze.build(initFunction = frame.setWall, initConifg = {'wall': wall})
+					newMaze.build(initFunction = frame.setWall, initConfig = {'wall': wall})
 					if validate and not test.valid(newMaze):
 						continue
 					newMazeList.append(newMaze)
