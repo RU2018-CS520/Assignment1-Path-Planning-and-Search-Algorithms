@@ -55,6 +55,7 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed 
 	#INPUT ARGS:
 	#class maze m: maze to be solved
 	#int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
+	#bool plotClosed: True: pass closed set to maze for ploting; False: discard closed set
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
@@ -127,7 +128,7 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed 
 			if fringeSize > maxFringeSize:
 				maxFringeSize = fringeSize
 	if plotClosed:
-		m.closed = sClosed.astype(bool) | gClosed.astype(bool)
+		m.closed = sClosed.astype(NP.bool) | gClosed.astype(NP.bool)
 	return (abs(blockCount), fullGoalPath, maxFringeSize)
 
 if __name__ == '__main__':
