@@ -441,3 +441,43 @@ nebr = lS.neighbor(size = 33, mutationP = 0.02)
 sPath = 'D:/Users/endle/Desktop/520/log/'
 newMaze = bA.beamAnneal(mList, obFn = obFn, nebr = nebr, teleportLimit = 2, maxIteration = 100, temperature = 10000., coolRate = 0.92, minT = 0.1, annealWeight = 16384, annealBias = 8, patience = 100, impatientRate = 0.001, tempSave = 10, savePath = sPath)
 ```
+
+## Genetic Algorithm
+### genetic.py
+**usage:**
+```
+from genetic import Population
+
+exampleAruguments = "{'mazeSize': 32, 'mazeWallRate': -1, 'populationSize': 750,'maxIteration': 130, 'reproductionRate': 0.7, 'mutationRate': 0.05, 'hugeMutation': 'True', 'weight': [0, 1, 0], 'solutionFunction': 'aStar', 'solutionConfig': {'LIFO': 'True', 'distFunction': 'manhattanDist'}}"
+
+# Usage 1: The type of Arguments is string.
+p1 = Population(**exampleArguments) 
+
+# Usage 2: The type of Arguments is mapping.
+#          Note that in 'solutionFunction' and 'disctFunction',
+#          'aStar' and 'manhattanDist' should be enclose by apostrophe.
+p2 = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 50,
+                       maxIteration = 100, reproductionRate = 0.7, mutationRate
+                       = 0.05, hugeMutation = True, weight = [0, 1, 0],
+                       solutionFunction = 'aStar', solutionConfig = {'LIFO':
+                                                                     True,
+                                                                     'distFunction'
+                                                                     :
+                                                                     'manhattanDist'})
+
+finalChild, finalPopulation = p1.iterate() # finalChild is the hardest maze, finalPopulation is the population after the last iteration
+```
+**aruguments:**
+```
+mazeSize[2, inf]: The size of maze to be generated.
+mazeWallRate[0.0, 1.0]: In each initial maze, the probability of each block to become a wall. The mazeWallRate will be randomly generated between [0.15, 0.38] if -1 is assigned to mazeWallRate.
+populationSize[2, inf]: The size of mazes for each generation.
+maxIteration[1, inf]: The max number of generations.
+reproductionRate[0.0, 1.0]: Represents the percentage of how many individuals would have the chance to reproduce.
+mutationRate[0.0, 1.0]: The probablity of the occurance of genetic mutation in a child.
+hugeMutation[True or False]: Allow the child to have more than one block changed at one mutation. (Up to 0.5 * mazeSize ^ 2 blocks could be changed at one mutation. The number of blocks to be changed should be applied to normal distribution.(At least in my mind)) 
+weight: You know... 
+solutionFunction: Could be either 'aStar', 'BDAStar', 'BFS' and 'DFS'
+solutionConfig: You know...
+distFunction: Could be either 'euclideanDist', 'manhattanDist', 'chebyshevDist'
+```
