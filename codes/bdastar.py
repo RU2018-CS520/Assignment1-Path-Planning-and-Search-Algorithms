@@ -51,7 +51,7 @@ def buildUp(size = 20, p = 0.2, initFunction = None, randomPosition = False):
 	m.build()
 	return m
 
-def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True):
+def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed = False):
 	#INPUT ARGS:
 	#class maze m: maze to be solved
 	#int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
@@ -126,12 +126,13 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True):
 			fringeSize = sFringe.qsize() + gFringe.qsize()
 			if fringeSize > maxFringeSize:
 				maxFringeSize = fringeSize
-
+	if plotClosed:
+		m.closed = sClosed.astype(bool) | gClosed.astype(bool)
 	return (abs(blockCount), fullGoalPath, maxFringeSize)
 
 if __name__ == '__main__':
 	M = buildUp(size = 64, p = 0.35)
-	t1 = biDirectionalAStar(m = M, distFunction = euclideanDist, LIFO = True)
+	t1 = biDirectionalAStar(m = M, distFunction = euclideanDist, LIFO = True, plotClosed = True)
 	t3 = biDirectionalAStar(m = M, distFunction = manhattanDist, LIFO = True)
 	t5 = biDirectionalAStar(m = M, distFunction = chebyshevDist, LIFO = True)
 	t7 = solution.BFS(M, BDBFS = True, quickGoal = True, randomWalk = True, checkFringe = True)
@@ -146,7 +147,7 @@ if __name__ == '__main__':
 	print(str(t7[0]) + ", " + str(l))
 	print(str(t9[0]) + ", " + str(t9[2]))
 	M.path = t3[1]
-#	imgastar = M.visualize()
+	imgastar = M.visualize()
 	M.path = t7[1]
 #	imgbfs = M.visualize()
 #	imgastar.save('/home/shengjie/astar.png', 'PNG')
