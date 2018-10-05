@@ -11,6 +11,7 @@ int cols in [2 : inf]:
 float p in [0 : 1]:
 np.array wall with ndim = 2 dtype = np.bool: True: this block is a wall; False: accessible empty block
 list path with element (row, col): a path from S to G. None or [] if not exist
+np.array closed with ndim = 2 dtype = np.bool: True: block is in closed set; False: cast off closed set
 (row, col) start: start point, default (0, 0)
 (row, col) goal: destination, default (rows-1, cols-1)
 bool isBuilt: True: has built up walls, do NOT build it again; False: empty maze, call function build() before solove it
@@ -401,6 +402,9 @@ newMaze = nebr(mList, validate = True)
 list maze with element frame.maze: init state maze
 class localSearch.objectiveFunction obFn: evaluate maze score
 class localSearch.neighbor nebr: generate maze's neighbor mazes
+bool validate: 
+	True: keep neighbors solvable; 
+	False: much faster but prefroms worse
 int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 
 	0: auto-adapt; 
 	1: no teleport permission
