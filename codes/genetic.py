@@ -2,6 +2,7 @@ import frame
 import random
 import unittest
 import numpy as NP
+import test
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 from bdastar import biDirectionalAStar as BDAStar
 from solution import DFS, BFS
@@ -154,6 +155,13 @@ class Population:
         #individualWithMaxFitness.visualize()
         return individualWithMaxFitness, pop
 
+    def replaceInitialMazes(self, index, m):
+        self.pop[index] = m
+
+    def save(self):
+        path = './temp/'
+        name = str(self.solutionFunction.__name__) + '+' + str(self.maxIteration) + '+' + str(self.mutationRate) + '+' + str(self.populationSize) + '.pkl'
+        test.saveMaze(self.pop, path, name)
 
 class TestGeneticAlgorithm(unittest.TestCase):
 
@@ -205,6 +213,17 @@ class TestGeneticAlgorithm(unittest.TestCase):
         #finalChild.printMaze()
         #finalChild.visualize()
 
+    def testSave(self):
+        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 50,
+                       maxIteration = 20, reproductionRate = 0.7, mutationRate
+                       = 0.05, hugeMutation = True, weight = [0, 1, 0],
+                       solutionFunction = 'aStar', solutionConfig = {'LIFO':
+                                                                     True,
+                                                                     'distFunction'
+                                                                     :
+                                                                     'manhattanDist'})
+        p.save()
+
 def buildUp(mazeSize, mazeWallRate):
     m = frame.maze(rows = mazeSize, cols = mazeSize, p = mazeWallRate)
     m.build(initFunction = None, randomPosition = False, force = False)
@@ -225,5 +244,6 @@ def printFitness(pop):
 if __name__ == '__main__':
     #unittest.main()
     mytest = unittest.TestSuite()
-    mytest.addTest(TestGeneticAlgorithm("testIteration"))
+    mytest.addTest(TestGeneticAlgorithm("testSave"))
+    #mytest.addTest(TestGeneticAlgorithm("testIteration"))
     unittest.TextTestRunner().run(mytest)
