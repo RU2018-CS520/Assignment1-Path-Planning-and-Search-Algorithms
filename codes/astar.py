@@ -54,6 +54,7 @@ def aStar(m, distFunction = manhattanDist, LIFO = True, plotClosed = False):
 	#INPUT ARGS:
 	#class maze m: maze to be solved
 	#int distType: a number indicating which method of distance calculation to use. aStar() will use Euclidean Distance as the distance if distType equals to 1, otherwise it will use Manhattan Distance.
+	#bool plotClosed: True: pass closed set to maze for ploting; False: discard closed set
 	#RETURN VALUE:
 	#int blockCount in [1, inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
@@ -107,7 +108,7 @@ def aStar(m, distFunction = manhattanDist, LIFO = True, plotClosed = False):
 		if fringeSize > maxFringeSize:
 			maxFringeSize = fringeSize
 	if plotClosed:
-		m.closed = closed.astype(bool)
+		m.closed = closed.astype(NP.bool)
 	return (abs(blockCount), goalPath, maxFringeSize)
 
 if __name__ == '__main__':
