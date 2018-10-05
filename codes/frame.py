@@ -92,7 +92,7 @@ class maze(object):
 		#RETURN VALUE:
 		#PIL.Image.Image img with mode = RGB: hi-res output maze map
 			
-		def gridOn(image, size = 20, grid = 1, color = 64, beacon = 80, distance = 16):
+		def gridOn(image, size = 20, grid = 1, color = 64, beacon = 64, distance = 16):
 			#np.array image with ndim = 2: output maze map image
 			#int color in [0 : 255]: grid color #TODO: adapt to chromatic image
 			#int beacon in [0 : 255]: beacon gird for every 64 blocks
@@ -126,7 +126,7 @@ class maze(object):
 				if self.wall[row, col]:
 					image[row*size+grid : row*size+size-grid, col*size+grid : col*size+size-grid] = 255
 		#closed
-		if self.closed is not None:
+		if hasattr(self, 'closed') and self.closed is not None:
 			cColor = [81, 88, 12]
 			for row in range(self.rows):
 				for col in range(self.cols):
