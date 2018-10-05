@@ -115,7 +115,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 				if keepSearch:
 					continue
 				if plotClosed:
-					m.closed = closed.astype(bool)
+					m.closed = closed.astype(np.bool)
 				if IDDFS:
 					return (blockCount, goalPath, maxFirngeSize, maxDepth)
 				return (blockCount, goalPath, maxFirngeSize)
@@ -138,7 +138,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 						goalPath = getPath(nextTemp, prev, m.start)
 						goalPath.reverse()
 						if plotClosed:
-							m.closed = closed.astype(bool)
+							m.closed = closed.astype(np.bool)
 						if IDDFS:
 							return (blockCount, goalPath, maxFirngeSize, maxDepth)
 						return (blockCount, goalPath, maxFirngeSize)
@@ -153,7 +153,7 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 				maxFirngeSize = len(fringe)
 		#failed, no path
 		if plotClosed:
-			m.closed = closed.astype(bool)
+			m.closed = closed.astype(np.bool)
 		if IDDFS:
 			return (blockCount, goalPath, maxFirngeSize, maxDepth)
 		return (blockCount, goalPath, maxFirngeSize)
@@ -188,6 +188,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 	#bool randomWalkPlus: True: totally random, no priority; False: depend on randomWalk
 	#bool checkFringe: True: keep fringe distinct; False: just keep no back turning
 	#int depthLimit in [1 : inf]: used to limit depth explores, 0 if n/a
+	#bool plotClosed: True: pass closed set to maze for ploting; False: discard closed set
 	#RETURN VALUE:
 	#int blockCount in [1 : inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
@@ -232,7 +233,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 				if not BDBFS:
 					maxDepth = maxDepth + 1
 				if plotClosed:
-					m.closed = sClosed.astype(bool) | gClosed.astype(bool) 
+					m.closed = sClosed.astype(np.bool) | gClosed.astype(np.bool) 
 				return (blockCount, sPath[:-1] + gPath, maxFirngeSize - int(not BDBFS))
 			else:
 				closed[i][temp] = closed[i][tuple(prev[i][temp])] + 1
@@ -259,7 +260,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 							if not BDBFS:
 								maxDepth = maxDepth + 1
 							if plotClosed:
-								m.closed = sClosed.astype(bool) | gClosed.astype(bool)
+								m.closed = sClosed.astype(np.bool) | gClosed.astype(np.bool)
 							return (blockCount, sPath[:-1] + gPath, maxFirngeSize - int(not BDBFS))
 					if checkFringe:
 						if closed[i][nextTemp] == 0:
@@ -274,7 +275,7 @@ def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus 
 				maxFirngeSize = fringeSize[0] + fringeSize[1]
 	#failed, no path
 	if plotClosed:
-		m.closed = sClosed.astype(bool) | gClosed.astype(bool)
+		m.closed = sClosed.astype(np.bool) | gClosed.astype(np.bool)
 	return (blockCount, sPath + gPath, maxFirngeSize - int(not BDBFS))
 
 
