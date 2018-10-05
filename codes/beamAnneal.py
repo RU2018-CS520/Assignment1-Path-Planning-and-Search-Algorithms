@@ -10,10 +10,12 @@ from solution import BFS, DFS
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 from bdastar import biDirectionalAStar as BDAStar
 
-def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001, tempSave = 0, savePath = 'D:/Users/endle/Desktop/520/log/'):
+def beamAnneal(mList, obFn, nebr, validate = False, teleportLimit = 0, backTeleport = True, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001, tempSave = 0, savePath = 'D:/Users/endle/Desktop/520/log/'):
+	#INPUT ARGS:
 	#list maze with element frame.maze: init state maze
 	#class localSearch.objectiveFunction obFn: evaluate maze score
 	#class localSearch.neighbor nebr: generate maze's neighbor mazes
+	#bool validate: True: keep neighbors solvable; False: much faster but prefroms worse
 	#int teleportLimit in [2 : len(mList)*nebr.size]: max agent in one root; 0: auto-adapt; 1: no teleport premission
 	#bool backTeleport: True: record before-teleporting maze to be able to teleport back; False: better is batter, who cares losers
 	#int maxIteration in [1 : inf]: directly halt searching
@@ -24,8 +26,10 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIte
 	#int or float annealBias in [0 : inf]: control probability of simulated annealing, especially when no effective mutation. the larger, the smaller
 	#int patience in [1 : inf]: the last way to halt searching when converged
 	#float impatientRate in [0 : inf]: control the number of converged iteration to cause a halt. the larger, the fewer. 0: disable impatient converge halt 
-	#int tempSave in [1 : inf]: save temp result to disk every tempSave iters, including mList, temperature, patiencee. 0: no save
+	#int tempSave in [1 : inf]: save temp result to disk every tempSave iters, including mList, temperature, patience. 0: no save
 	#str savePath: saved file path. REMEMBER: end with a slash
+	#RETURN VAL:
+	#list mList with element frame.maze: finetuned mazes
 
 	iterCount = 0
 	patienceDecrease = impatientRate
@@ -48,7 +52,7 @@ def beamAnneal(mList, obFn, nebr, teleportLimit = 0, backTeleport = True, maxIte
 		print(' iter %i, mean score: %.2f' %(iterCount, np.mean(tempScore)), end = ',')
 		startTime = timeit.default_timer()
 		#get neighbor score
-		tempNext = nebr(mList, validate = True) #CAUTION: validate will dramatically slow down
+		tempNext = nebr(mList, validate = validate) #CAUTION: validate will dramatically slow down
 		nextScore = np.asarray(obFn(tempNext))
 		#prepare move to next
 		rootCount = np.full(len(mList), teleportLimit, dtype = np.uint8)
@@ -144,7 +148,7 @@ if __name__ == '__main__':
 	obFn = lS.objectiveFunction(w = [0,1,0], solutionFunction = sF, solutionConfig = sC, deRandom = False)
 	nebr = lS.neighbor(size = 33, mutationP = 0.02)
 	sPath = 'D:/Users/endle/Desktop/520/log/'
-	newMaze = beamAnneal(mList, obFn = obFn, nebr = nebr, teleportLimit = 2, maxIteration = 100, temperature = 10000., coolRate = 0.92, minT = 0.1, annealWeight = 16384, annealBias = 8, patience = 100, impatientRate = 0.001, tempSave = 10, savePath = sPath)
+	newMaze = beamAnneal(mList, obFn = obFn, nebr = nebr, validate = True, teleportLimit = 2, maxIteration = 100, temperature = 10000., coolRate = 0.92, minT = 0.1, annealWeight = 16384, annealBias = 8, patience = 100, impatientRate = 0.001, tempSave = 10, savePath = sPath)
 	path = 'D:/Users/endle/Desktop/520/'
 	name = 'newMaze.pkl'
 	m = newMaze[0]
