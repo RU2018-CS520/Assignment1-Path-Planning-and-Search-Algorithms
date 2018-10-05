@@ -3,6 +3,9 @@ import random
 import unittest
 import numpy as NP
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
+from bdastar import biDirectionalAStar as BDAStar
+from solution import DFS, BFS
+
 
 class Population:
 
@@ -149,7 +152,7 @@ class Population:
                 if tempFitness > maxFitness:
                     maxFitness, individualWithMaxFitness = tempFitness, tempIndividual
         #individualWithMaxFitness.visualize()
-        return individualWithMaxFitness
+        return individualWithMaxFitness, pop
 
 
 class TestGeneticAlgorithm(unittest.TestCase):
@@ -189,12 +192,18 @@ class TestGeneticAlgorithm(unittest.TestCase):
         printFitness(nextGeneration)
 
     def testIteration(self):
-        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 750,
-                       maxIteration = 130, reproductionRate = 0.7, mutationRate
-                       = 0.05, hugeMutation = True, weight = [0, 1, 0], solutionFunction = aStar, solutionConfig = {'LIFO': True, 'distFunction' : manhattanDist})
-        finalChild = p.iterate()
+        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 50,
+                       maxIteration = 100, reproductionRate = 0.7, mutationRate
+                       = 0.05, hugeMutation = True, weight = [0, 1, 0],
+                       solutionFunction = 'aStar', solutionConfig = {'LIFO':
+                                                                     True,
+                                                                     'distFunction'
+                                                                     :
+                                                                     'manhattanDist'})
+        finalChild, finalpop = p.iterate()
+        print(finalChild, finalpop)
         #finalChild.printMaze()
-        finalChild.visualize()
+        #finalChild.visualize()
 
 def buildUp(mazeSize, mazeWallRate):
     m = frame.maze(rows = mazeSize, cols = mazeSize, p = mazeWallRate)

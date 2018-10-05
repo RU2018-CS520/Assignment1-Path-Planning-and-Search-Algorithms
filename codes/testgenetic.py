@@ -2,7 +2,6 @@ import sys
 import ast
 import json
 from genetic import Population
-from astar import aStar as aS, euclideanDist, manhattanDist, chebyshevDist
 
 if __name__ == '__main__':
     argu1 = ast.literal_eval(sys.argv[1])
