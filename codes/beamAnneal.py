@@ -10,7 +10,7 @@ from solution import BFS, DFS
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 from bdastar import biDirectionalAStar as BDAStar
 
-def beamAnneal(mList, obFn, nebr, validate = False, teleportLimit = 0, backTeleport = True, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001, tempSave = 0, savePath = 'D:/Users/endle/Desktop/520/log/'):
+def beamAnneal(mList, obFn, nebr, validate = False, teleportLimit = 0, backTeleport = True, maxIteration = 100, temperature = 10000., coolRate = 0.9, minT = 0.1, annealWeight = 1, annealBias = 4, patience = 100, impatientRate = 0.001, tempSave = 0, savePath = 'D:/Users/endle/Desktop/520/log/', suffix = '[]'):
 	#INPUT ARGS:
 	#list maze with element frame.maze: init state maze
 	#class localSearch.objectiveFunction obFn: evaluate maze score
@@ -127,7 +127,7 @@ def beamAnneal(mList, obFn, nebr, validate = False, teleportLimit = 0, backTelep
 		#prepare new iter
 		mList = nextList
 		if tempSave and not bool(iterCount%tempSave):
-			test.saveMaze((mList, temperature, patience), savePath, str(iterCount) + '.tmp.pkl')
+			test.saveMaze((mList, temperature, patience), savePath, str(iterCount) + suffix + '.tmp.pkl')
 	#print result
 	totalEnd = timeit.default_timer()
 	print('\n********beam annealing result********')
