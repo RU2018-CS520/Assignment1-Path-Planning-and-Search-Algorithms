@@ -10,15 +10,14 @@ if __name__ == '__main__':
     #argu2 = ast.literal_eval(sys.argv[2])
     #print(argu1)
     path = '/common/users/sl1560/temp/'
-    name = 'aStar+130+0.18+500.pkl'
+    name = 'aStar+120+0.1+500.pkl'
     p = Population(**argu1)
     pp = test.loadMaze(path, name)
-    for i in range(100):
+    for i in range(1):
         p.replaceInitialMazes(i, pp[i])
         print('changed', pp[i].score)
-    pp[0].visualize()
-    #finalchild, finalPopulation = p.iterate()
-    #p.save()
+    finalchild, finalPopulation = p.iterate()
+    p.save()
     #finalchild.visualize()
     #p = Population(**sys.argv[1])
     #arguments = sys.argv[1].replace("'", "\"")

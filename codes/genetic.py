@@ -167,8 +167,8 @@ class Population:
         self.pop[index] = m
 
     def save(self):
-        path = '/common/users/sl1560/temp/'
-        name = str(self.solutionFunction.__name__) + '+' + str(self.maxIteration) + '+' + str(self.mutationRate) + '+' + str(self.populationSize) + '.pkl'
+        path = '/common/users/sl1560/log/'
+        name = str(self.solutionFunction.__name__) + '+' + str(self.maxIteration) + '+' + str(self.mutationRate) + '+' + str(self.populationSize) + 'fringe.pkl'
         test.saveMaze(self.pop, path, name)
 
 class TestGeneticAlgorithm(unittest.TestCase):
@@ -209,7 +209,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
 
     def testIteration(self):
         print('Started testing of iteration')
-        p = Population(mazeSize = 128, mazeWallRate = -1, populationSize = 500,
+        p = Population(mazeSize = 2, mazeWallRate = -1, populationSize = 500,
                        maxIteration = 120, reproductionRate = 0.7, mutationRate
                        = 0.1, hugeMutation = True, weight = [0, 1, 0],
                        solutionFunction = 'aStar', solutionConfig = {'LIFO':
@@ -257,10 +257,10 @@ if __name__ == '__main__':
     ##mytest.addTest(TestGeneticAlgorithm("testSave"))
     #mytest.addTest(TestGeneticAlgorithm("testIteration"))
     #unittest.TextTestRunner().run(mytest)
-    print('Started testing of iteration')
-    p = Population(mazeSize = 128, mazeWallRate = -1, populationSize = 500,
-                   maxIteration = 120, reproductionRate = 0.7, mutationRate
-                   = 0.1, hugeMutation = True, weight = [0, 1, 0],
+    print('Genetic Algorithm Started.')
+    p = Population(mazeSize = 128, mazeWallRate = -1, populationSize = 1400,
+                   maxIteration = 130, reproductionRate = 0.7, mutationRate
+                   = 0.1, hugeMutation = True, weight = [0, 0, 1],
                    solutionFunction = 'aStar', solutionConfig = {'LIFO':
                                                                  True,
                                                                  'distFunction'
