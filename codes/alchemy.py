@@ -45,8 +45,9 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 	#dict gAArg, bAArg:
 	#class obFn nebr:
 	#str logPath: used for save log mazes
-	#int beamSeedNum: size of beam search
-	#int nonPerfectSeedNum: 
+	#int beamSeedNum in [1 : genetic.populationSize]: size of beam search
+	#int nonPerfectSeedNum [0 : beamSeedNum]: the number of seed could be 
+
 	#genetic
 	gAPopulation = genetic.Population(**gAArg)
 	print('start genetic')
@@ -65,7 +66,7 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 	seedList = []
 	for i in range(len(index)):
 		if i - nonPerfectSeedCount < len(index) - beamSeedNum:
-			if seedScore[index[i]] < seedMargin * maxSeedScore: #too low score
+			if nonPerfectSeedNum == 0 or seedScore[index[i]] < seedMargin * maxSeedScore: #too low score
 				continue
 			probablity = math.exp((maxSeedScore / seedScore[index[i]]) * -2)
 			if random.random() < probablity:
