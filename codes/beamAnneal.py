@@ -130,7 +130,7 @@ def beamAnneal(mList, obFn, nebr, validate = False, teleportLimit = 0, backTelep
 			test.saveMaze((mList, temperature, patience), savePath, str(iterCount) + '.tmp.pkl')
 	#print result
 	totalEnd = timeit.default_timer()
-	print('\n********result********')
+	print('\n********beam annealing result********')
 	if iterCount >= maxIteration:
 		print('reached maxIteration')
 	if patience <= 0:
