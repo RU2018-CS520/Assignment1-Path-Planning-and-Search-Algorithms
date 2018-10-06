@@ -36,17 +36,20 @@ def getArg(mazeSize, mazeWallRate,
 	#beamAnneal
 	bAArg = {'validate' : validate, 'teleportLimit' : teleportLimit, 'backTeleport' : backTeleport, 
 			'maxIteration' : bAIteration, 'temperature' : temperature, 'coolRate' : coolRate, 'minT' : minT, 'annealWeight' : annealWeight, 'annealBias' : annealBias, 
-			'patience' : patience, 'impatientRate' : impatientRate, 'tempSave' : tempSave, 'savePath' : tempSavePath}
-	alArg = {'logPath' : tempSavePath, 'beamSeedNum': bABeamSize, 'seedMargin' : seedMargin, 'nonPerfectSeedNum' : nonPerfectSeedNum}
+			'patience' : patience, 'impatientRate' : impatientRate, 'tempSave' : tempSave, 'savePath' : tempSavePath, 'suffix' : str(weight)}
+	alArg = {'logPath' : tempSavePath, 'beamSeedNum': bABeamSize, 'seedMargin' : seedMargin, 'nonPerfectSeedNum' : nonPerfectSeedNum, 'suffix' : str(weight)}
 	return (gAArg, oFArg, nbArg, bAArg, alArg)
 
-def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfectSeedNum):
+def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfectSeedNum, suffix):
 	#INPUT ARGS:
 	#dict gAArg, bAArg:
 	#class obFn nebr:
 	#str logPath: used for save log mazes
 	#int beamSeedNum in [1 : genetic.populationSize]: size of beam search
-	#int nonPerfectSeedNum [0 : beamSeedNum]: the number of seed could be 
+	#int nonPerfectSeedNum [0 : beamSeedNum]: the number of seed could be not enough good
+
+	#RETURN VAL:
+	#list finalMaze with element frame.maze: finetuned mazes
 
 	#genetic
 	gAPopulation = genetic.Population(**gAArg)
@@ -57,7 +60,7 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 	seedScore = np.asarray(obFn(finalPopulation))
 	print('\n********genetic result********')
 	print('final score: %.2f, for %.2fm' %(np.mean(seedScore), ((gAEndTime - gAStartTime) / 60.)))
-	test.saveMaze(finalPopulation, logPath, 'geneticFinalMazeList.pkl')
+	test.saveMaze(finalPopulation, logPath, 'geneticFinalMazeList' + suffix + '.pkl')
 	#prepare for beamAnneal
 	index = list(np.argsort(seedScore))
 	maxSeedScore = seedScore[index[-1]]
@@ -85,7 +88,14 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 	#printout
 	finalScore = np.asarray(obFn(finalMaze))
 	index = list(np.argsort(finalScore))
-	print('\n\n************genetic result************')
+	index.reverse()
+	finalMaze = list(np.asarray(finalMaze)[index])
+	gAIndex = 0
+	for i in range(len(index)):
+		if finalMaze[i].score < finalPopulation[gAIndex].score:
+			finalMaze[i] = finalPopulation[gAIndex]
+			gAIndex = gAIndex + 1
+	print('\n\n************final result************')
 	print('final score: %.2f, %.2f, etc., for %.2fm in total' %(finalScore[index[0]], finalScore[index[1]], ((bAEndTime - gAStartTime) / 60.)))
 	return finalMaze
 
@@ -137,4 +147,4 @@ if __name__ == '__main__':
 	#god knows...
 	finalMaze = alchemy(gAArg = gAArg, bAArg = bAArg, obFn = obFn, nebr = nebr, **alArg)
 	#CAUTION SAVE IT!
-	test.saveMaze(finalMaze, resultPath, resultName)
+	test.saveMaze(finalMaze, resultPath, str(weight) + resultName)
