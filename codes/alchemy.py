@@ -90,13 +90,13 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 
 if __name__ == '__main__':
 	#maze
-	mazeSize = 16
+	mazeSize = 128 #test 16 first
 	mazeWallRate = -1
 	#genetic
-	populationSize = 10
-	gAIteration = 15
+	populationSize = 500 #test 16 first
+	gAIteration = 130 #test 16 first
 	reproductionRate = 0.7
-	gAMutationRate = 0.05
+	gAMutationRate = 0.1
 	hugeMutation = True
 	#beam simulated annealing
 	bABeamSize = 5
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 	validate = True
 	teleportLimit = 2
 	backTeleport = True
-	bAIteration = 15
+	bAIteration = 200 #test 16 first
 	temperature = 100.
 	coolRate = 0.945
 	minT = 0.001
