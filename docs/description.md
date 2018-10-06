@@ -485,3 +485,119 @@ solutionFunction: Could be either 'aStar', 'BDAStar', 'BFS' and 'DFS'
 solutionConfig: You know...
 distFunction: Could be either 'euclideanDist', 'manhattanDist', 'chebyshevDist'
 ```
+
+## alchemy
+use genetic algorithm as pretrain and beam annealing as finetune.
+speaking of the result, god knows...
+
+### getArg()
+**input args:**
+```
+see previous description
+```
+
+**return val:**
+```
+dict gAArg, oFArg, nbArg, bAArg, alArg: input args for alchemy
+```
+
+### alchemy()
+**input args:**
+```
+dict gAArg, bAArg:
+class obFn nebr:
+str logPath: used for save log mazes
+int beamSeedNum in [1 : genetic.populationSize]: size of beam search
+int nonPerfectSeedNum [0 : beamSeedNum]: the number of seed could be not enough good
+```
+**return val:**
+```
+list finalMaze with element frame.maze: finetuned mazes
+```
+
+**usage:**
+maximize path length of aStar(manhattan)
+```
+#maze
+mazeSize = 128 #test 16 first
+mazeWallRate = -1
+#genetic
+populationSize = 500 #test 16 first
+gAIteration = 130 #test 16 first
+reproductionRate = 0.7
+gAMutationRate = 0.1
+hugeMutation = True
+#beam simulated annealing
+bABeamSize = 5
+bANeighborSize = 20
+bAMutationRate = 0.001
+validate = True
+teleportLimit = 2
+backTeleport = True
+bAIteration = 200 #test 16 first
+temperature = 100.
+coolRate = 0.945
+minT = 0.001
+annealWeight = 1024
+annealBias = 8
+patience = 100
+impatientRate = 0.001
+tempSave = 10
+tempSavePath = 'D:/Users/endle/Desktop/520/log/'
+#objectiveFunction
+weight = [0, 1, 0] #path
+solveFun = aStar
+solveCfg = {'distFunction' : manhattanDist, 'LIFO' : True}
+deRandom = False
+#others
+seedMargin = 0.95
+nonPerfectSeedNum = 3
+resultPath = 'D:/Users/endle/Desktop/520/'
+resultName = 'finalMazeList.pkl'
+#get args
+gAArg, oFArg, nbArg, bAArg, alArg = getArg(mazeSize = mazeSize, mazeWallRate = mazeWallRate, 
+									populationSize = populationSize, gAIteration = gAIteration, reproductionRate = reproductionRate, gAMutationRate = gAMutationRate, hugeMutation = hugeMutation, 
+									bABeamSize = bABeamSize, bANeighborSize = bANeighborSize, bAMutationRate = bAMutationRate, validate = validate, teleportLimit = teleportLimit, backTeleport = backTeleport, bAIteration = bAIteration, 
+									temperature = temperature, coolRate = coolRate, minT = minT, annealWeight = annealWeight, annealBias = annealBias, patience = patience, impatientRate = impatientRate, tempSave = tempSave, tempSavePath = tempSavePath, 
+									weight = weight, solveFun = solveFun, solveCfg = solveCfg, deRandom = deRandom, seedMargin = seedMargin, nonPerfectSeedNum = nonPerfectSeedNum)
+obFn = lS.objectiveFunction(**oFArg)
+nebr = lS.neighbor(**nbArg)
+#god knows...
+finalMaze = alchemy(gAArg = gAArg, bAArg = bAArg, obFn = obFn, nebr = nebr, **alArg)
+#CAUTION SAVE IT!
+test.saveMaze(finalMaze, resultPath, resultName)
+```
+*alternative*
+weight:
+```
+weight = [1, 0, 0] #block
+weight = [0, 1, 0] #path
+weight = [0, 0, 1] #fringe
+```
+solution:
+```
+#DFS
+solveFun = DFS
+solveCfg = {'quickGoal' : True, 'randomWalk' : True} #CAUTION: should enable deRandom, see localSearch. TODO: improve genetic to enable deRandom
+#BFS
+solveFun = BFS
+solveCfg = {'BDBFS' : True, 'quickGoal' : True, 'checkFringe' : True}
+#AStar(euclidean)
+solveFun = aStar
+solveCfg = {'distFunction' : euclideanDist, 'LIFO' : True}
+#AStar(manhattan)
+solveFun = aStar
+solveCfg = {'distFunction' : manhattanDist, 'LIFO' : True}
+#AStar(chebyshev)
+solveFun = aStar
+solveCfg = {'distFunction' : chebyshevDist, 'LIFO' : True}
+#BDAStar(euclidean)
+solveFun = BDAStar
+solveCfg = {'distFunction' : euclideanDist, 'LIFO' : True}
+#BDAStar(manhattan)
+solveFun = BDAStar
+solveCfg = {'distFunction' : manhattanDist, 'LIFO' : True}
+#BDAStar(chebyshev)
+solveFun = BDAStar
+solveCfg = {'distFunction' : chebyshevDist, 'LIFO' : True}
+```
