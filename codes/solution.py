@@ -63,7 +63,7 @@ def getPath(temp, prev, start):
 	return path + [start]
 
 
-def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False, plotClosed = False):
+def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, distinctFringe = False, checkFringe = False, plotClosed = False):
 	#INPUT ARGS: #further reading: description.md
 	#class maze m: maze to be solved
 	#bool IDDFS: True: Iterative Deepening Depth First Search; False: DFS
@@ -71,20 +71,22 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe; False: return when pop goal out from fringe
 	#bool randomWalk: True: priority: R and D > L and U; False: priority: strictly R > D > L > U
 	#bool randomWalkPlus: True: totally random, no priority; False: depend on randomWalk
-	#bool checkFringe: True: keep fringe distinct; False: just keep no back turning
+	#bool distinctFringe imcompatible with checkFringe: True: keep fringe distinct, and closed block will be always closed; False: just keep no back turning, but can visit a block twice
+	#bool checkFringe imcompatible with checkFringe: True: keep fringe distinct and best; False: just keep no back turning, but can visit a block twice
 	#bool plotClosed: True: pass closed set to maze for ploting; False: discard closed set
 	#RETURN VALUE:
 	#int blockCount in [1 : inf]: the number of blocks have opend
 	#list goalPath with element (row, col): a path from S to G. [] if not exist
 	#int maxDepth in [1 : inf]: the max depth of explored blocks
 	
-	def DFSCore(m, IDDFS = False, depthLimit = 0, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False, plotClosed = False):
+	def DFSCore(m, IDDFS = False, depthLimit = 0, keepSearch = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, distinctFringe = False, checkFringe = False, plotClosed = False):
 		#INPUT ARGS:
 		#int depthLimit in [1 : inf]: used in IDDFS to limit depth each iteration explores, 0 if not IDDFS
 		#OUTPUT ARGS: 
 		#int maxDepth in [1 : inf]: max depth of searched blocks
 		#others see DFS
 		fringe = []
+		visited = np.zeros_like(m.wall, dtype = np.bool)
 		closed = np.zeros_like(m.wall, dtype = np.uint32) #memory cost, but compatible with checkFringe #TODO: what if size > 65000
 		prev = np.full((m.wall.shape + (2,)), max(m.rows, m.cols), dtype = np.uint16) #TODO: size > 65000
 		prev[m.start] = m.start
@@ -98,7 +100,12 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		#core
 		while fringe:
 			temp, tempDepth = fringe.pop()
-			#pre
+			#preprocessing
+			if distinctFringe:
+				if visited[temp]:
+					continue
+				else:
+					visited[temp] = True
 			if checkFringe and closed[temp] != 0 and closed[temp] < tempDepth:
 				continue
 			if tempDepth > maxDepth:
@@ -159,6 +166,10 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		return (blockCount, goalPath, maxFirngeSize)
 
 	#check input
+	if distinctFringe and checkFringe:
+		print('W: DFS(), contradictory input args DISTINCTFRINGE and CHECKFRINGE')
+		distinctFringe = False
+		checkFringe = False
 	if IDDFS and keepSearch:
 		print('W: DFS(), contradictory input args IDDFS and KEEPSEARCH')
 		keepSearch = False
@@ -171,12 +182,12 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		totalCount = 0
 		prevCount = 0
 		for depthLimit in itertools.count(1):
-			count, path, maxFirngeSize, maxDepth = DFSCore(m, IDDFS = IDDFS, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe, plotClosed = plotClosed)
+			count, path, maxFirngeSize, maxDepth = DFSCore(m, IDDFS = IDDFS, depthLimit = depthLimit, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, distinctFringe = distinctFringe, checkFringe = checkFringe, plotClosed = plotClosed)
 			totalCount = totalCount + count
 			if path or maxDepth < depthLimit:
 				return (totalCount, path, maxFirngeSize)
 	else:
-		return DFSCore(m, keepSearch = keepSearch, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, checkFringe = checkFringe, plotClosed = plotClosed)
+		return DFSCore(m, keepSearch = keepSearch, quickGoal = quickGoal, randomWalk = randomWalk, randomWalkPlus = randomWalkPlus, distinctFringe = distinctFringe, checkFringe = checkFringe, plotClosed = plotClosed)
 
 
 def BFS(m, BDBFS = False, quickGoal = False, randomWalk = False, randomWalkPlus = False, checkFringe = False, depthLimit = 0, plotClosed = False):
