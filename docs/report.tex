@@ -42,13 +42,13 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	\hline
 	\makecell[c]{Name \\ RUID} & Workload \\
 	\hline
-	\makecell[c]{Haoyang Zhang \\ 188008687} & {Implemented DFS, Iterative Deepening DFS, BFS, Bidirectional BFS, Beam Search, Simulated Annealing and the visualization of maze. Modified DFS to make it able to return optimal path. Added Last-in First-out feature to $ A^* $. Managed to combine Beam Search, Simulated Annealing and Genetic Algorithm. Ran tests for DFS and BFS in question 10. Finished half of the writing of report for part 2.} \\
+	\makecell[c]{Haoyang Zhang \\ 188008687} & {Implemented DFS, Iterative Deepening DFS, BFS, Bidirectional BFS, Bidirectional $ A^* $, Beam Search, Simulated Annealing and the visualization of maze. Modified DFS to make it able to return optimal path. Added Last-in First-out feature to $ A^* $. Managed to combine Beam Search, Simulated Annealing and Genetic Algorithm. Ran tests for DFS and BFS in question 10. Finished half of the writing of report for part 2.} \\
 	\hline
-	\makecell[c]{Han Wu \\ 189008460} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 1, 2, 4 and 5. Finished the writing of report for question 1, 2, 4 and 5.} \\
+	\makecell[c]{Han Wu \\ 189008460} & {Wrote python scripts for testing the performance of algorithms. Combine the data and generated figures for question 1, 2, 4 and 5. Finished the writing of report for question 1, 2, 4 and 5.} \\
 	\hline
-	\makecell[c]{Shengjie Li \\ 188008047} & {Implemented $ A^* $ with Euclidean Distance, $ A^* $ with Manhattan Distance and Genetic Algorithm. Ran tests for $ A^* $ with Euclidean Distance and Manhattan Distance inquestion 10. Finished the writing of whole report. } \\
+	\makecell[c]{Shengjie Li \\ 188008047} & {Implemented $ A^* $ with Euclidean Distance, $ A^* $ with Manhattan Distance and Genetic Algorithm. Ran tests for $ A^* $ with Euclidean Distance and Manhattan Distance inquestion 10. Finished the format design of whole report. } \\
 	\hline
-	\makecell[c]{Zhichao Xu \\ 188008912} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 3, 6 and 7. Generated figures for questions in part 1. Finished the writing of report for question 3, 6 and 7. Suggested an improvement of $ A^* $ using Chebyshev Distance.} \\
+	\makecell[c]{Zhichao Xu \\ 188008912} & {Wrote python scripts for testing the performance of algorithms. Combine the data and generated figures for question 3, 6 and 7. Finished the writing of report for question 3, 6 and 7. Suggested an improvement of $ A^* $ using Chebyshev Distance.} \\
 	\hline
 \end{tabular}
 
@@ -57,8 +57,11 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 \label{sec:Part 1: Path Planning}
 
 \begin{questions}
-	\item {For each of the implemented algorithms, how large the maps can be ( in terms of dim ) for the algorithm to return an answer in a reasonable amount of time (less than a minute) for a range of possible p values? Select a size so that running the algorithms multiple times will not be a huge time commitment, but that the maps are large enough to be interesting.} \\
-	The results are shown below as Table \ref{Table 1}: \\
+	\item {For each of the implemented algorithms, how large the maps can be ( in terms of dim ) for the algorithm to return an answer in a reasonable amount of time (less than a minute) for a range of possible $ p $ values? Select a size so that running the algorithms multiple times will not be a huge time commitment, but that the maps are large enough to be interesting.} \\
+	
+	In order to find a reasonable size of the maze, we tested the running time of the algorithm. For each size, we generated 10 mazes and run different algorithms on these 10 mazes. We recorded the average time each algorithm needs to return an answer. The 10 mazes in each test ccould be either solvable or unsolvable. We set $ p $ equals to 0.3 and executed the experiment. \\
+	The results are shown below as Table \ref{Table 1}:  \\
+	
 	\begin{center}
 		\label{Table 1}
 		\begin{tabular}[h]{| c | c | c | c | c | c | c | c |}
@@ -80,13 +83,39 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 		\end{tabular}
 		\captionof{table}{}
 	\end{center}
-	DFS was the default setting. All conditions were false. BFS1 was the default setting. All conditions were False. However, it took too much time. When the size was 30, it took more than 250 seconds to return an answer. So, we changed the settings a little to make BFS acceptable. Here came BFS2. In BFS2, checkFringe was True. The others were also False. $ A^* $ Euclidean means $ A^* $ algorithm which used Euclidean Distance as the heuristic function. $ A^* $ Manhattan means A Star algorithm which used Manhattan Distance as the heuristic function.
+
+	DFS was the default setting. BFS1 was the default setting. However, it took too much time. When the size was 30, it took more than 250 seconds to return an answer. So, we changed the settings a little to make BFS acceptable. Here came BFS2. In BFS2, checkFringe=True. The others were also False. A* Euclidean means that A* algorithm used Euclidean Distance as the heuristic function. A* Euclidean means that A Star algorithm used Manhattan Distance as the heuristic function. \\
 	
-	In the table, we could see that when size becomes large, the average time of returning an answer (whether solvable or unsolvable) increases. BFS2 and $ A^* $ Euclidean are often the most time-consuming algorithms. We need to run the algorithm for thousands of times (有待确认) in the following tests. In order to make it faster in the following test, we chose 200 as the default size of our maze.
+	In the table, we could see that when size becomes large, the average time of returning an answer (whether solvable or unsolvable) increases. BFS2 and A* Euclidean are often the most time-consuming algorithms. We need to run the algorithm repeatedly for the purpose of validations. In order to make it faster in the following test, we chose 200 as the default size of our maze. \\
 	
-	\item {Find a random map with $ p \approx 0.2 $ that has a path from corner to corner. Show the paths returned for each algorithm. (Showing maps as ASCII printouts with paths indicated is sufficient; however 20 bonus points are available for coding good visualizations.)}
+	\item {Find a random map with $ p \approx 0.2 $ that has a path from corner to corner. Show the paths returned for each algorithm. (Showing maps as ASCII printouts with paths indicated is sufficient; however 20 bonus points are available for coding good visualizations.)} \\
 	
-	\item {For a fixed value of dim as determined in Question (1), for each $ p = 0.1, 0.2, 0.3, ... , 0.9 $, generate a number of maps and try to find a path from start to goal - estimate the probability that a random map has a complete path from start to goal, for each value of $ p $. Plot your data. Note that for $ p $ close to 0, the map is nearly empty and the path is clear; for $ p $ close to 1, the map is mostly filled and there is no clear path. There is some threshhold value $ p_0 $ so that for $ p < p_0 $ , there is usually a clear path, and $ p > p_0 $ there is no path. Estimate $ p_0 $ . Which path finding algorithm is most useful here, and why?}
+	TODO\\
+	
+	\item {For a fixed value of dim as determined in Question (1), for each $ p = 0.1, 0.2, 0.3, ... , 0.9 $, generate a number of maps and try to find a path from start to goal - estimate the probability that a random map has a complete path from start to goal, for each value of $ p $. Plot your data. Note that for $ p $ close to 0, the map is nearly empty and the path is clear; for $ p $ close to 1, the map is mostly filled and there is no clear path. There is some threshhold value $ p_0 $ so that for $ p < p_0 $ , there is usually a clear path, and $ p > p_0 $ there is no path. Estimate $ p_0 $ . Which path finding algorithm is most useful here, and why?} \\
+	
+	In this question, we tried to use a grid-search method first to narrow down the scope of parameters. We used 200 as the mazeSize, and we generated 800 different mazes for the validation of the parameter value. \\
+	
+	After getting the result, we plotted the rate of successfully finding a path vs the $ p $-value. See Figure \ref{fig:3-1}. \\
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{../pics/question3-1.png}
+		\caption{\label{fig:3-1}rate of successfully finding a path vs the $ p $-value.}
+	\end{figure}
+	
+	Then we tried to decrease the step size, and selected the $ p $-value from 0.16 to 0.40 as the $ x $-label to generate a new plot for better analyzing the threshold value here. See Figure \ref{fig:3-2}.\\
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{../pics/question3-2.png}
+		\caption{\label{fig:3-2}rate of successfully finding a path vs the $ p $-value.}
+	\end{figure}
+
+	After analyzing the result, we notice that the when $ p $ is at 0.40, the success rate stays at 0. Thus we came to conclusion that the threshold is 0.40 for $ p $ here. And to gain a  50\%  of success rate, the $ p $-value should be set to 0.30. \\
+	
+	In this problem, we used the Bidirectional $ A^* $ method, and the optimal distance function is Manhattan Distance. After the calculation, we found that BD$ A^* $ consumes less time than other algorithms. In this specific problem, because we simplified the settings, we could only move to 4 directions. Manhattan Distance better simulates such scenarios thus it has the best performance here. \\
+	
 	
 	\item {For a range of $ p $ values (up to $ p_0 $), generate a number of maps and estimate the average or expected length of the shortest path from start to goal. You may discard all maps where no path exists. Plot your data. What path finding algorithm is most useful here?}
 	
