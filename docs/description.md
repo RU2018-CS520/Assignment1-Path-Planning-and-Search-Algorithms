@@ -79,7 +79,7 @@ bool IDDFS:
 	True: IDDFS. promise optimal if expand(updatable), but if checkFringe, very slow
 	False: DFS. much absolutely faster
 	CAUTION: if keepSearch: force keepSearch = False
-bool keepSearch incompatible with quickGoal: 
+bool keepSearch incompatible with quickGoal, distinctFringe: 
 	True: not return until empty fringe. promise optimal if expand(updatable)
 		CAUTION: incredibly slow, checkFringe may accelerate dramatically
 		CAUTION: Force expand(updatable = True)
@@ -97,7 +97,10 @@ bool randomWalkPlus:
 	True: totally random, no priority. may be effictive when maze.build(randomPosition)
 		CAUTION: force randomWalk = True
 	False: depend on randomWalk
-bool checkFringe:
+bool distinctFringe incompatible with checkFringe, keepSearch: 
+	True: keep fringe distinct, and closed block will be always closed
+	False: just keep no back turning, but can visit a block twice
+bool checkFringe incompatible with distinctFringe:
 	True: besides closed set, keep fringe distinct. to some extent, return a shorter path, but not definitely shortest; 
 		CAUTION: force expand(updatable = Ture)
 	False: just keep no back turning. a little bit faster if not IDDFS
@@ -108,6 +111,9 @@ int blockCount in [1 : inf]: The number of blocks has been opened. A reference o
 list goalPath with element (row, col): a path from S to G. [] if not exist. REMEMBER: maze.path = goalPath
 int maxFringe in [1 : inf]: The max size of this algorithm's fringe. Another reference of how hard the maze is.
 ```
+
+**==issue regarding distinctFringe and checkFringe==**
+Theoretically, both of them should search the fringe to check if the block to be pushed has already been in the fringe. However, it takes too much time to do so. Therefore, we push those nodes first, and check them whether have been added in closed set when popping out. In this case, it can be done in a constant time.
 
 **usage:**
 
@@ -487,7 +493,7 @@ distFunction: Could be either 'euclideanDist', 'manhattanDist', 'chebyshevDist'
 ```
 
 ## alchemy
-use genetic algorithm as pretrain and beam annealing as finetune.
+use genetic algorithm as pre-training and beam annealing as finetuning.
 speaking of the result, god knows...
 
 ### getArg()
