@@ -47,7 +47,7 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 	#str logPath: used for save log mazes
 	#int beamSeedNum in [1 : genetic.populationSize]: size of beam search
 	#int nonPerfectSeedNum [0 : beamSeedNum]: the number of seed could be not enough good
-
+	#str suffix: avoid confiliction of file name
 	#RETURN VAL:
 	#list finalMaze with element frame.maze: finetuned mazes
 
