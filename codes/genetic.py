@@ -3,6 +3,7 @@ import random
 import unittest
 import numpy as NP
 import test
+from time import time
 from astar import aStar, euclideanDist, manhattanDist, chebyshevDist
 from bdastar import biDirectionalAStar as BDAStar
 from solution import DFS, BFS
@@ -144,23 +145,30 @@ class Population:
         maxFitness = -1
         individualWithMaxFitness = -1
         pop = self.pop
+        totalTime = 0
         for iteration in range(self.maxIteration + 1):
+            startTime = time()
             pop = self.nextGeneration(pop)
-            print('iteration: ' + repr(iteration) + ' - ' + repr(pop[0].score)) 
+            stopTime = time()
+            timePassed = stopTime - startTime
+            totalTime += timePassed
+            print('iteration: ' + repr(iteration) + ' - ' + repr(pop[0].score) + ' time:' + repr(timePassed))
             if iteration % 10 == 0:
                 print('iteration: ' + repr(iteration))
                 tempFitness, tempIndividual = printFitness(pop)
                 if tempFitness > maxFitness:
                     maxFitness, individualWithMaxFitness = tempFitness, tempIndividual
         #individualWithMaxFitness.visualize()
+        self.pop = pop
+        print(totalTime)
         return individualWithMaxFitness, pop
 
     def replaceInitialMazes(self, index, m):
         self.pop[index] = m
 
     def save(self):
-        path = './temp/'
-        name = str(self.solutionFunction.__name__) + '+' + str(self.maxIteration) + '+' + str(self.mutationRate) + '+' + str(self.populationSize) + '.pkl'
+        path = '/common/users/sl1560/log/'
+        name = str(self.solutionFunction.__name__) + '+' + str(self.maxIteration) + '+' + str(self.mutationRate) + '+' + str(self.populationSize) + 'fringe.pkl'
         test.saveMaze(self.pop, path, name)
 
 class TestGeneticAlgorithm(unittest.TestCase):
@@ -200,9 +208,10 @@ class TestGeneticAlgorithm(unittest.TestCase):
         printFitness(nextGeneration)
 
     def testIteration(self):
-        p = Population(mazeSize = 32, mazeWallRate = -1, populationSize = 50,
-                       maxIteration = 100, reproductionRate = 0.7, mutationRate
-                       = 0.05, hugeMutation = True, weight = [0, 1, 0],
+        print('Started testing of iteration')
+        p = Population(mazeSize = 2, mazeWallRate = -1, populationSize = 500,
+                       maxIteration = 120, reproductionRate = 0.7, mutationRate
+                       = 0.1, hugeMutation = True, weight = [0, 1, 0],
                        solutionFunction = 'aStar', solutionConfig = {'LIFO':
                                                                      True,
                                                                      'distFunction'
@@ -210,6 +219,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
                                                                      'manhattanDist'})
         finalChild, finalpop = p.iterate()
         print(finalChild, finalpop)
+        p.save()
         #finalChild.printMaze()
         #finalChild.visualize()
 
@@ -242,8 +252,20 @@ def printFitness(pop):
     return maxFitness, individualWithMaxFitness
 
 if __name__ == '__main__':
-    #unittest.main()
-    mytest = unittest.TestSuite()
-    mytest.addTest(TestGeneticAlgorithm("testSave"))
+    ##unittest.main()
+    #mytest = unittest.TestSuite()
+    ##mytest.addTest(TestGeneticAlgorithm("testSave"))
     #mytest.addTest(TestGeneticAlgorithm("testIteration"))
-    unittest.TextTestRunner().run(mytest)
+    #unittest.TextTestRunner().run(mytest)
+    print('Genetic Algorithm Started.')
+    p = Population(mazeSize = 128, mazeWallRate = -1, populationSize = 1400,
+                   maxIteration = 130, reproductionRate = 0.7, mutationRate
+                   = 0.1, hugeMutation = True, weight = [0, 0, 1],
+                   solutionFunction = 'aStar', solutionConfig = {'LIFO':
+                                                                 True,
+                                                                 'distFunction'
+                                                                 :
+                                                                 'manhattanDist'})
+    finalChild, finalpop = p.iterate()
+    print(finalChild, finalpop)
+    p.save()

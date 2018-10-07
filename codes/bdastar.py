@@ -63,6 +63,8 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed 
 	size = m.rows
 	sFringe = queue.PriorityQueue()
 	gFringe = queue.PriorityQueue()
+	sVisited = NP.zeros_like(m.wall, dtype = NP.bool)
+	gVisited = NP.zeros_like(m.wall, dtype = NP.bool)
 	sClosed = NP.zeros_like(m.wall, dtype = NP.uint32)
 	gClosed = NP.zeros_like(m.wall, dtype = NP.uint32)
 	sLastPos = NP.zeros([m.rows, m.cols, 2], dtype = NP.uint16)
@@ -81,6 +83,7 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed 
 	gFringe.put(((distFunction(m.goal, m.start), blockCount), m.goal, 1))
 	#prepare for BD
 	fringe = [sFringe, gFringe]
+	visited = [sVisited, gVisited]
 	closed = [sClosed, gClosed]
 	lastPos = [sLastPos, gLastPos]
 	goalPath = [sGoalPath, gGoalPath]
@@ -92,7 +95,11 @@ def biDirectionalAStar(m, distFunction = manhattanDist, LIFO = True, plotClosed 
 			stepcnt = current[2]
 			x = current[1][0]
 			y = current[1][1]
-	
+			
+			if visited[d][x][y] == True:
+				continue
+			visited[d][x][y] = True
+
 			closed[d][x, y] = stepcnt
 			if LIFO:
 				blockCount -= 1
