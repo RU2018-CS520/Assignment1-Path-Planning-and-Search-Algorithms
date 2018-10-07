@@ -96,16 +96,16 @@ def alchemy(gAArg, bAArg, obFn, nebr, logPath, beamSeedNum, seedMargin, nonPerfe
 			finalMaze[i] = finalPopulation[gAIndex]
 			gAIndex = gAIndex + 1
 	print('\n\n************final result************')
-	print('final score: %.2f, %.2f, etc., for %.2fm in total' %(finalScore[index[0]], finalScore[index[1]], ((bAEndTime - gAStartTime) / 60.)))
+	print('final score: %.2f, %.2f, etc., for %.2fm in total' %(finalMaze[0].score, finalMaze[1].score, ((bAEndTime - gAStartTime) / 60.)))
 	return finalMaze
 
 if __name__ == '__main__':
 	#maze
-	mazeSize = 128 #test 16 first
+	mazeSize = 16 #test 16 first
 	mazeWallRate = -1
 	#genetic
-	populationSize = 500 #test 16 first
-	gAIteration = 130 #test 16 first
+	populationSize = 16 #test 16 first
+	gAIteration = 16 #test 16 first
 	reproductionRate = 0.7
 	gAMutationRate = 0.1
 	hugeMutation = True
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 	validate = True
 	teleportLimit = 2
 	backTeleport = True
-	bAIteration = 200 #test 16 first
+	bAIteration = 16 #test 16 first
 	temperature = 100.
 	coolRate = 0.945
 	minT = 0.001
