@@ -6,6 +6,12 @@
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{makecell}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, pdfstartview=FitV, linkcolor=blue, citecolor=black, plainpages=false, pdfpagelabels=true, urlcolor=blue}
+\usepackage[all]{hypcap}
+
 
 
 % Adjust margins
@@ -34,11 +40,11 @@ In this group project, apart from implementing DFS, BFS, A* with Euclidean Dista
 	\hline
 	\makecell[c]{Haoyang Zhang \\ 188008687} & {Implemented DFS, Iterative Deepening DFS, BFS, Bidirectional BFS, Beam Search, Simulated Annealing and the visualization of maze. Modified DFS to make it able to return optimal path. Added Last-in First-out feature to A*. Managed to combine Beam Search, Simulated Annealing and Genetic Algorithm. Ran tests for DFS and BFS in question 10. Finished half of the writing of report for part 2.} \\
 	\hline
-	\makecell[c]{Han Wu \\ 189008460} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 1, 2, 4 and 5. Finished the writing of report for question 1, 2, 4 and 5} \\
+	\makecell[c]{Han Wu \\ 189008460} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 1, 2, 4 and 5. Finished the writing of report for question 1, 2, 4 and 5.} \\
 	\hline
 	\makecell[c]{Shengjie Li \\ 188008047} & {Implemented A* with Euclidean Distance, A* with Manhattan Distance and Genetic Algorithm. Ran tests for A* with Euclidean Distance and Manhattan Distance inquestion 10. Finished the writing of whole report. } \\
 	\hline
-	\makecell[c]{Zhichao Xu \\ 188008912} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 3, 6 and 7. Generated figures for questions in part 1. Finished the writing of report for question 3, 6 and 7. Suggested an improvement of A* using Chebyshev Distance} \\
+	\makecell[c]{Zhichao Xu \\ 188008912} & {Wrote python scripts for testing the performance of algorithms. Got and Combine the data for question 3, 6 and 7. Generated figures for questions in part 1. Finished the writing of report for question 3, 6 and 7. Suggested an improvement of A* using Chebyshev Distance.} \\
 	\hline
 \end{tabular}
 
@@ -47,13 +53,37 @@ In this group project, apart from implementing DFS, BFS, A* with Euclidean Dista
 \label{sec:Part 1: Path Planning}
 
 \begin{enumerate}
-	\item {For each of the implemented algorithms, how large the maps can be ( in terms of dim ) for the algorithm to return an answer in a reasonable amount of time (less than a minute) for a range of possible p values? Select a size so that running the algorithms multiple times will not be a huge time commitment, but that the maps are large enough to be interesting} \\
-	The results are shown below: \\
-	\begin{tabular}{| c | c | c | c | c | c | c | c |}
-		\hline
-		\multicolumn{6}{3}{text}
-		Time(s) & \\
-	\end{tabular}
+	\item {For each of the implemented algorithms, how large the maps can be ( in terms of dim ) for the algorithm to return an answer in a reasonable amount of time (less than a minute) for a range of possible p values? Select a size so that running the algorithms multiple times will not be a huge time commitment, but that the maps are large enough to be interesting.} \\
+	The results are shown below as table \ref{table1}: \\
+	\begin{center}
+		\label{table1}
+		\begin{tabular}[h]{| c | c | c | c | c | c | c | c |}
+			\hline
+			\multicolumn{2}{|c|}{} & \multicolumn{6}{c|}{Size} \\
+			\cline{3-8}
+			\multicolumn{2}{|c|}{} & 100 & 200 & 400 & 800 & 1600 & 3200 \\
+			\hline
+			\multirow{5}{*}{Time(s)} & DFS & 0.01942 & 0.07087 & 0.28435 & 0.93919 & 4.5064 & 10.83366 \\
+			\cline{2-8}
+			 & BFS\textsuperscript{2} & 0.07342 & 0.33946 & 1.73646 & 6.40967 & 25.69253 & 91.73234 \\
+			 \cline{2-8}
+			 & A* Euclidean & 0.07811 & 0.41706 & 1.62604 & 5.97804 & 25.27724 & 100.37974 \\
+			 \cline{2-8}
+			 & A* Manhattan & 0.06093 & 0.29222 & 0.88752 & 3.63068 & 11.147 & 63.8882 \\
+			 \cline{2-8}
+			 & BFS\textsuperscript{1} & \multicolumn{6}{l|}{254.36093 (size=30)} \\
+			 \hline
+		\end{tabular}
+		\captionof{table}{}
+	\end{center}
+	DFS was the default setting. All conditions were false. BFS1 was the default setting. All conditions were False. However, it took too much time. When the size was 30, it took more than 250 seconds to return an answer. So, we changed the settings a little to make BFS acceptable. Here came BFS2. In BFS2, checkFringe was True. The others were also False. A* Euclidean means A* algorithm which used Euclidean Distance as the heuristic function. A* Manhattan means A Star algorithm which used Manhattan Distance as the heuristic function.
+	
+	In the table, we could see that when size becomes large, the average time of returning an answer (whether solvable or unsolvable) increases. BFS2 and A* Euclidean are often the most time-consuming algorithms. We need to run the algorithm for thousands of times (有待确认) in the following tests. In order to make it faster in the following test, we chose 200 as the default size of our maze.
+	
+	\item {Find a random map with $ p \approx 0.2 $ that has a path from corner to corner. Show the paths returned for each algorithm. (Showing maps as ASCII printouts with paths indicated is sufficient; however 20 bonus points are available for coding good visualizations.)}
+	
+	\item {For a fixed value of dim as determined in Question (1), for each $ p = 0.1, 0.2, 0.3, ... , 0.9 $, generate a number of maps and try to find a path from start to goal - estimate the probability that a random map has a complete path from start to goal, for each value of $ p $. Plot your data. Note that for $ p $ close to 0, the map is nearly empty and the path is clear; for $ p $ close to 1, the map is mostly filled and there is no clear path. There is some threshhold value $ p_0 $ so that for $ p < p_0 $ , there is usually a clear path, and $ p > p_0 $ there is no path. Estimate $ p_0 $ . Which path finding algorithm is most useful here, and why?}
+	
 \end{enumerate}
 
 
