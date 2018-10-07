@@ -3,11 +3,12 @@
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
-\usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{makecell}
 \usepackage{multirow}
 \usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[all]{hypcap}
 \usepackage{enumitem}
@@ -42,11 +43,11 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	\hline
 	\makecell[c]{Name \\ RUID} & Workload \\
 	\hline
-	\makecell[c]{Haoyang Zhang \\ 188008687} & {Implemented DFS, Iterative Deepening DFS, BFS, Bidirectional BFS, Bidirectional $ A^* $, Beam Search, Simulated Annealing and the visualization of maze. Modified DFS to make it able to return optimal path. Added Last-in First-out feature to $ A^* $. Managed to combine Beam Search, Simulated Annealing and Genetic Algorithm. Ran tests for DFS and BFS in question 10. Finished half of the writing of report for part 2.} \\
+	\makecell[c]{Haoyang Zhang \\ 188008687} & {Implemented DFS, Iterative Deepening DFS, BFS, Bidirectional BFS, Bidirectional $ A^* $, Simulated-Annealing-Based Beam Search and the visualization of maze. Modified DFS to make it able to return optimal path. Added Last-in First-out feature to $ A^* $. Managed to combine Simulated-Annealing-Based Beam Search with Genetic Algorithm. Ran tests for DFS and BFS in question 10. Finished half of the writing of report for part 2.} \\
 	\hline
 	\makecell[c]{Han Wu \\ 189008460} & {Wrote python scripts for testing the performance of algorithms. Combine the data and generated figures for question 1, 2, 4 and 5. Finished the writing of report for question 1, 2, 4 and 5.} \\
 	\hline
-	\makecell[c]{Shengjie Li \\ 188008047} & {Implemented $ A^* $ with Euclidean Distance, $ A^* $ with Manhattan Distance and Genetic Algorithm. Ran tests for $ A^* $ with Euclidean Distance and Manhattan Distance inquestion 10. Finished the format design of whole report. } \\
+	\makecell[c]{Shengjie Li \\ 188008047} & {Implemented $ A^* $ with Euclidean Distance, $ A^* $ with Manhattan Distance and Genetic Algorithm. Ran tests for $ A^* $ with Euclidean Distance and Manhattan Distance inquestion 10. Finished the format design of whole report using \LaTeX. } \\
 	\hline
 	\makecell[c]{Zhichao Xu \\ 188008912} & {Wrote python scripts for testing the performance of algorithms. Combine the data and generated figures for question 3, 6 and 7. Finished the writing of report for question 3, 6 and 7. Suggested an improvement of $ A^* $ using Chebyshev Distance.} \\
 	\hline
@@ -90,7 +91,26 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	
 	\item {Find a random map with $ p \approx 0.2 $ that has a path from corner to corner. Show the paths returned for each algorithm. (Showing maps as ASCII printouts with paths indicated is sufficient; however 20 bonus points are available for coding good visualizations.)} \\
 	
-	TODO\\
+	In this question, we drew the path of using different algorithms to solve the maze and we studied the effect of different parameters on the problem solving. \\
+	We took 20×20 maze as an example. The maze is shown below: \\
+	
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/question2-1.png}
+		\caption{A really Awesome Image}\label{fig:awesome_image1}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/question2-1.png}
+		\caption{A really Awesome Image}\label{fig:awesome_image2}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/question2-1.png}
+		\caption{A really Awesome Image}\label{fig:awesome_image3}
+		\endminipage
+	\end{figure}
+	
+	TODO \\
+	
 	
 	\item {For a fixed value of dim as determined in Question (1), for each $ p = 0.1, 0.2, 0.3, ... , 0.9 $, generate a number of maps and try to find a path from start to goal - estimate the probability that a random map has a complete path from start to goal, for each value of $ p $. Plot your data. Note that for $ p $ close to 0, the map is nearly empty and the path is clear; for $ p $ close to 1, the map is mostly filled and there is no clear path. There is some threshhold value $ p_0 $ so that for $ p < p_0 $ , there is usually a clear path, and $ p > p_0 $ there is no path. Estimate $ p_0 $ . Which path finding algorithm is most useful here, and why?} \\
 	
@@ -233,6 +253,26 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	\begin{enumerate}[resume]
 		
 		\item {What local search algorithm did you pick, and why? How are you representing the maze/environment, to be able to utilize your chosen search algorithm? What design choices did you have to make to apply this search algorithm to this problem?}
+		
+		\begin{enumerate}
+			\item {What local search algorithm did you pick, and why?} \\
+			We combined Genetic Algorithm with Simulated-Annealing-Based Beam Search. We have several reasons: \\
+			\begin{enumerate}
+				\item {Genetic Algorithm works much better than Simulated-Annealing-Based Beam Search when the mutation rate is large.} \\
+				
+				\item {Genetic Algorithm usually returns mazes with the "pattern"(or say "schema") that makes a maze hard. However, it is hard to finetune the "pattern" when its size is too large because the pattern is likely to be cut into 2 halves and unlikely to be pieced together again. For instance, (one of) the ideal pattern of the longest path maze should seem like a Hilbert curve, which is as large as the maze. A slight dislocation will make the maze unsolvable. Hence we need another algorithm to finetune.} \\
+				
+				\item {Beam Search requires a brunch of initial states(mazes), which perfectly matches the population of final iteration from Genetic Algorithm. Also, Simulated Annealing can be helpful when it runs into a local maximum. Combine Beam Search and Simulated Annealing to both utilize most mazes that Genetic Algorithm returned and avoid converging at a local maximum.}
+			\end{enumerate}
+			
+			\item {How are you representing the maze/environment, to be able to utilize your chosen search algorithm? What design choices did you have to make to apply this search algorithm to this problem?} 
+			
+			\textbf{Overall:}
+			\begin{enumerate}
+				\item {A maze can be represented by a $ rows \times cols $ boolean matrix, where True means this block is a wall, and False means the agent can go through this block.} \\
+				\item {The objective function value(fitness) of a maze is calculated by this formula: $$ObjectiveFunction(maze) = w_{block}*BlockCount+w_{path}*PathLength+w_{fringe}*FringeSize$$ If we want to find the hardest maze in terms of a single aspect, set one weight is 1, and the others are 0.} \\
+			\end{enumerate}
+		\end{enumerate}
 		
 		\item {Unlike the problem of solving a maze, for which the ‘goal’ is well-defined, it is difficult to know when we have constructed the ‘hardest’ maze. That being so, what kind of termination conditions can you apply to your search algorithm to generate ‘hard’ if not the ‘hardest’ mazes? What kind of shortcomings or advantages do you anticipate your approach having?}
 		
