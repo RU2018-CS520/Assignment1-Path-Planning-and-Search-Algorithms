@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[all]{hypcap}
+\usepackage[space]{grffile}
 \usepackage{enumitem}
 
 \newlist{questions}{enumerate}{1}
@@ -137,6 +138,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	Speaking of priority queue. 2 elements with the same priority can be LIFO or FIFO. The FIFO ones are more common, but we also have tried a LIFO one. LIFO ones preforms much like DFS, especially the maze is nearly empty (no walls). \\
 	
 	All the comparison is recorded in the table. Notice that BDA* LIFO with Manhattan is extraordinary except for non-optimal. \\
+	
+	\textbf{A more detailed answer of question 2 could be found in Q2.docx}.
 	
 	\begin{figure}
 		\minipage{0.32\textwidth}
@@ -419,9 +422,9 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\item {The probability of one individual has the chance to reproduce is $ \frac{Fitness-of-individual}{Total-fitness-of-the-popualtion} $}
 				\item {There are 3 types of reproduction. }
 				\begin{itemize}
-					\item {Type 1: Randomly choose a number n in [1:size], a child consists of his father's left $ size \times n$ matrix and his mother's $ size \times size - n$ matrix}
-					\item {Type 2: Randomly choose a number n in [1:size], a child consists of his father's left $ n \times size$ matrix and his mother's $ size - n \times size$ matrix}
-					\item {Type 3: Randomly choose a number n in [1:size], a child consists of his father's upper-left triangle matrix and his mother's bottom-left triangle matrix}
+					\item {Type 1: Randomly choose a number n in [1:size], a child is made of his father's left $ size \times n$ matrix and his mother's $ size \times size - n$ matrix}
+					\item {Type 2: Randomly choose a number n in [1:size], a child is made of his father's left $ n \times size$ matrix and his mother's $ size - n \times size$ matrix}
+					\item {Type 3: A child is made of his father's upper-left triangle matrix and his mother's bottom-left triangle matrix}
 				\end{itemize}
 				\item {There is 10\% chance that a child will mutate genetically. When mutate happens, a random number(At most $ n^2 - 2$, applies to the normal distribution) of nodes will be changed to its opposite.}
 				\item {Generally, we run Genetic Algorithm of the population size between 800 and 1400, max iterations of 140.}
@@ -735,8 +738,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\begin{figure}
 					\centering
-					\includegraphics[width=\textwidth]{../pics/bf/pattern.png}
-					\caption{\label{fig:bf-pattern} Comparison of average number of nodes expanded.}
+					\includegraphics[width=0.3\textwidth]{../pics/bf/pattern.png}
+					\caption{\label{fig:bf-pattern}}
 				\end{figure}
 				
 				\textbf{Reasons:} 
@@ -811,24 +814,21 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {The pathway near the Goal(10 * 10 blocks in the lower right corner) is extremely narrow(only 1 block width), opens to left, and begins with a "door sill" wall that forces the path to move up a block.}
-					
-					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+					\item {A nearly "empty"(no walls) maze is usually hard for A* with Euclidean Distance Heuristic(A*E for short) in terms of time complexity.}
 				\end{itemize}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {The pathway opens to left rather than up makes $ A^* $ with Euclidean Distance Heuristic cannot first run right to the last column and then find the pathway. It takes time for $ A^* $ with Euclidean Distance Heuristic to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
-					\item {After $ A^* $ with Euclidean Distance Heuristic reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for $ A^* $ with Euclidean Distance Heuristic to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
-					\item {Therefore, $ A^* $ with Euclidean Distance Heuristic nearly searched all the blocks to reach the Goal.}
-					\item {Notice that if randomWalk == True, this pattern will not always work because $ A^* $ with Euclidean Distance Heuristic may go down first rather than right.}
+					\item {A*E natrually tends to search all blocks, because Euclidean Distance is much smaller than actrually cost if this block is not in the last column and row.}
+					\item {At each level, A*E will search diagnoal blocks, but find their expectation cost increased a lot. Then try to seach other blocks, which leads to these blocks' expectation cost also increased and even larger than diagnoal blocks.}
+					\item {Therefore, A*E will regard every block as a worth searching block as long as the path do not turn up or left.}
+					\item {Actually, if the whole maze have no northeast pathways or southwest pathways. A*E performs exactaly as same as BFS.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for $ A^* $ with Euclidean Distance Heuristic to turn back to search lower left part. }
-					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+					\item {A totally "empty" maze whose number of blocks opened is exactly $size \times size = 16384$.}
+					\item {The best score we have got is 14586, compared with at most 16384. However, it is really difficult to cancel out those walls by random. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 				
 				
@@ -852,21 +852,19 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+					\item {The path is along the diagnoal line accurately and it seldom deviates from this direction.}
 				\end{itemize}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The time complexity of $ A^* $ with Euclidean Distance Heuristic related to the maximum depth it has searched.}
-					\item {Hence, a "door sill" pattern can force $ A^* $ with Euclidean Distance Heuristic to search lower left part rather than immediately reach the Goal, which increased the maximum depth of $ A^* $ with Euclidean Distance Heuristic.}
-					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
+					\item {This is because using the Euclidean distance as the distance function, the algorithm picks the path such that the Euclidean distance is minimized.}
+					\item {To minimize the Eculidean distance, according to the Pythagorean theorem, the distance along the diagonal in a square-shaped maze is the optimal path. So the algorithm picks this path as the optimal path.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {The same maze as Question 10.b.ii.}
-					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
-					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+					\item {The theoritically maximum fringe size is $(size - 1)^2 - WallCost = 16113$, and we got 9760 in our test cases.}
+					\item {Again, it is difficult to cancel out those outside walls generated randomly without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 			\end{enumerate}
 			
@@ -927,25 +925,25 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {The pathway near the Goal(10 * 10 blocks in the lower right corner) is extremely narrow(only 1 block width), opens to left, and begins with a "door sill" wall that forces the path to move up a block.}
-					
-					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+					\item {A nearly "empty"(no walls) maze. But there should be a narrow northeast or southwest pathway. And only this pathway leads to the Goal.}
 				\end{itemize}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {The pathway opens to left rather than up makes $ A^* $ with Manhattan Distance Heuristic cannot first run right to the last column and then find the pathway. It takes time for $ A^* $ with Manhattan Distance Heuristic to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
-					\item {After $ A^* $ with Manhattan Distance Heuristic reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for $ A^* $ with Manhattan Distance Heuristic to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
-					\item {Therefore, $ A^* $ with Manhattan Distance Heuristic nearly searched all the blocks to reach the Goal.}
-					\item {Notice that if randomWalk == True, this pattern will not always work because $ A^* $ with Manhattan Distance Heuristic may go down first rather than right.}
+					\item {Once there is a counter-diagonal pathway near the Goal, the expectation cost of all blocks in the pathway will be increased.}
+					\item {In this case, a totally empty outside will set every outside block with the same expectation cost, which is smaller than pathway blocks' expectation cost.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+					\item {Compare to $size * size - WallCost =16377$, 14210 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze. See Figure \ref{fig:amb-pattern}.}
 				\end{itemize}
 				
+				\begin{figure}
+					\centering
+					\includegraphics[width=0.3\textwidth]{../pics/amb/pattern.png}
+					\caption{\label{fig:amb-pattern}}
+				\end{figure}
 				
 				\item {Maximum size of fringe during runtime: See Figure \ref{fig:amf1}, Figure \ref{fig:amf2} and Figure \ref{fig:amf3}.} \\
 				\begin{figure}
@@ -967,7 +965,9 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+					\item {There are only a limited numbers of exits of lower left part, usually only one or two exits.}
+					\item {The path length to exits is nearly equal.}
+					\item {Blocks far from exits tend to be empty.}
 				\end{itemize}
 				
 				\textbf{Reasons:} 
@@ -979,9 +979,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {The same maze as Question 10.b.ii.}
-					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
-					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+					\item {The theoritically maximum fringe size is $(size - 1)^2 - WallCost = 16113$, and we got 9760 in our test cases.}
+					\item {Again, it is difficult to cancel out those outside walls generated randomly without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 			\end{enumerate}
 		\end{enumerate}
