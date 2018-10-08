@@ -270,11 +270,78 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 			\textbf{Overall:}
 			\begin{enumerate}
 				\item {A maze can be represented by a $ rows \times cols $ boolean matrix, where True means this block is a wall, and False means the agent can go through this block.} \\
-				\item {The objective function value(fitness) of a maze is calculated by this formula: $$ObjectiveFunction(maze) = w_{block}*BlockCount+w_{path}*PathLength+w_{fringe}*FringeSize$$ If we want to find the hardest maze in terms of a single aspect, set one weight is 1, and the others are 0.} \\
+				
+				\item {The objective function value(fitness) of a maze is calculated by this formula: $$ObjectiveFunction(maze) = 
+					\begin{bmatrix}
+						BlockCount & PathLength & FringeSize \\
+					\end{bmatrix} 
+					\times 
+					\begin{bmatrix}
+						w_{block} \\
+						w_{path}\\
+						w_{fringe} 
+					\end{bmatrix}$$  If we want to find the hardest maze in terms of a single aspect, set one weight to 1, and set others to 0.} \\
+				
+				\item {Genetic Algorithm will return much more mazes than what Beam Annealing requires. Therefore, using the idea similar to Simulated Annealing to pick some mazes as seeds of Beam Annealing.} \\
+				\begin{enumerate}
+					\item {Pick a few best mazes as "perfect seeds".} \\
+					
+					\item {Discard mazes whose fitness is lower than some percent, say 90\%, of maximum fitness, if the number of remained mazes is larger than the size of Beam Search.} \\
+					
+					\item {Randomly pick some "non-prefect seeds" with the probability: $$P = e^{{\frac{Weight}{PerfectRatio}+Bias}}, PrefectRatio = \frac{ObjectiveFunction(otherMaze)}{ObjectiveFunction(bestMaze)}$$} \\
+					
+					\item {Keep picking until the number of "seeds" equals the size of Beam Search.}
+				\end{enumerate}
+			
+				\item {After Beam Annealing, compare the fine-tuned result with previous Genetic Algorithm's result. Return best several mazes of both results. (In this case, Beam Annealing failed because Genetic Algorithm presented a nearly perfect result. However, Annealing allows mazes to get a little easier, which is difficult to become harder again since it is hard to randomly get a perfect maze.} 
+			\end{enumerate} 
+		
+			\textbf{Genetic Algorithm:} \\
+			TODO \\
+			
+			\textbf{Beam Annealing:} \\
+			\begin{enumerate}
+				\item {A maze's neighbors are all the mazes that can become this maze by changing several blocks. Therefore, we choose a very small probability to flip each block's value to generate some neighbors of this maze for Stochastic Beam Search.} \\
+				
+				\item {Each solution algorithm returns 3 values: the number of blocks it has explored, the length of the path found, and the maximum size of the fringe it has used.} \\
+				
+				\item {The probability to move down is calculated by this formula: $$P = e^{\frac{Weight*\Delta E+Bias}{Temperature}}, \Delta E = ObjectiveFunction(newMaze) - ObjectiveFunction(maze)$$ A larger $Weight$ can decrease $P$ without any other influence. A larger $Bias$ mainly decrease the probability to keep step forward and back in a "plateaux", which works together with "impatient halt"(explained in Question 9).} \\
+				
+				\item {Decrease the temperature by multiply a const smaller than 1.0, called "cool rate", which makes the temperature go down fast at first and then getting slower and slower to let agent have more chance to climb up(explained in Question 9).} \\
+				
+				\item {Speaking of Beam Annealing, the key point is to make an agent can "regress" to where it was, especially when an agent "teleports" to another agent's region. Hence, once an agent teleport, one of its neighbors is set to a maze in the previous region.} \\
+				
+				\item {In order to increase the performance, each neighbor maze will be check if it is solvable by using BDA*. If it is unsolvable, regenerate it.}
 			\end{enumerate}
 		\end{enumerate}
 		
-		\item {Unlike the problem of solving a maze, for which the ‘goal’ is well-defined, it is difficult to know when we have constructed the ‘hardest’ maze. That being so, what kind of termination conditions can you apply to your search algorithm to generate ‘hard’ if not the ‘hardest’ mazes? What kind of shortcomings or advantages do you anticipate your approach having?}
+		\item {Unlike the problem of solving a maze, for which the ‘goal’ is well-defined, it is difficult to know when we have constructed the ‘hardest’ maze. That being so, what kind of termination conditions can you apply to your search algorithm to generate ‘hard’ if not the ‘hardest’ mazes? What kind of shortcomings or advantages do you anticipate your approach having?} \\
+		
+		\textbf{Genetic Algorithm:} \\
+		TODO\\
+		
+		\textbf{Beam Annealing:} \\
+		There are 3 different ways to halt the iteration: \\
+		\begin{enumerate}
+			\item {Maximum Iteration Limit: Count the time it iterates. Once it exceeds the limit, halt and return the result.} 
+			\begin{itemize}
+				\item {It is the easiest way to terminate iteration, but actually, there is no reason to terminate it EXACTLY there, except that it has run too many times.}
+			\end{itemize}
+		
+			\item {System Cooled Down: As time goes(it iterates), the temperature of Annealing decreases. If it is below a minimum temperature, halt and return the result.} 
+			\begin{itemize}
+				\item {If the temperature is too "cold", there is no need to keep Annealing. No easier mazes could be picked up. It is reasonable.}
+				\item {It related to the cool rate. If the cool rate is too small, the temperature will decrease too fast, and there is not enough time for a maze getting harder after becoming easy. However, if the cool rate is too large, the temperature will keep a high level for a long time, which may totally destroy the work Genetic Algorithm has done.}
+			\end{itemize}
+		
+			\item {No Patience Left: If agents do not move for a really long time, it must converge at a local optimal. It is time to halt and return the result.} 
+			\begin{itemize}
+				\item {Since we have found a local optimal, we should return it.}
+				\item {In the beginning, it is less likely to converge. Hence we should iterate it for a little more times. But if it has been iterated for lots of times, it is unnecessary to keep iterations going.}
+				\item {When an agent climbs on a "plateaux", it will get lost. Hence, we should limit its ability to move to an equal-difficult maze by using $Bias$ to calculate the probability to move.}
+				\item {The issue is, sometimes, Genetic Algorithm returns a "nearly perfect" maze. In this case, it takes at least 30 iterations to halt, since we assume what Genetic Algorithm did is just pre-training.}
+			\end{itemize}
+		\end{enumerate}
 		
 		\item {For each of the following algorithms, do the following: Using your local search algorithm, for each of the following properties indicated, generate and present three mazes that attempt to maximize the indicated property. Do you see any patterns or trends? How can you account for them? What can you hypothesize about the ‘hardest’ maze, and how close do you think you got to it?}
 	\end{enumerate}
