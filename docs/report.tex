@@ -90,25 +90,143 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 	
 	\item {Find a random map with $ p \approx 0.2 $ that has a path from corner to corner. Show the paths returned for each algorithm. (Showing maps as ASCII printouts with paths indicated is sufficient; however 20 bonus points are available for coding good visualizations.)} \\
 	
-	In this question, we drew the path of using different algorithms to solve the maze and we studied the effect of different parameters on the problem solving. \\
-	We took 20×20 maze as an example. The maze is shown below: \\
+	In this question, lots of algorithms have been applied to solve the same maze, because BFS, DFS and $ A^* $ have several variants. We have implemented them and compared differences between all the variants. \\
+	
+	Starting with a small maze whose size is $ 16 \times 16 $ as Figure \ref{fig:maze} shows. \\
+	
+	The most common DFS opens 43 blocks and its maximum fringe size is also 43. Coincidentally, it returns a path whose length is still 43. Apparently, its path is not optimal. See Figure \ref{fig:q2-2}. \\
+	
+	Then we have tried Iterative Deepening DFS which opens 2753 blocks (calculated accumulatively). Its maximum fringe size is 34 and path length is 33. Notice that IDDFS do not return an optimal path(explained in “Modify DFS to Return an Optimal Path.html”)! See Figure \ref{fig:q2-3}. \\
+	
+	In order to return an optimal path, IDDFS and checkFringe should be set True. CheckFringe means keeping that blocks in the fringe always have the shortest path seen so far, but if we find a new path to this block, which is shorter, update no matter whether this block has been added to closed set or not. In this case, 8453 blocks have been opened, and the maximum fringe size is 29. The optimal path length is 31. See Figure \ref{fig:q2-4}.\\
+	
+	Also, there is another way to find an optimal path. Set keepSearch is True. In this case, when DFS find a path, save it rather than return. Keep searching for a shorter path. However, it takes too much time to return (A small comparison is recorded in the table.). See Figure \ref{fig:q2-5}. \\
+	
+	Hence, we can use checkFringe to accelerate keepSearch. By doing so, it opens only 1118 blocks (compared with 8453 of IDDFS and checkFringe), and its fringe size is at most 35. Its path is also optimal. See Figure \ref{fig:q2-6}. \\
+	
+	There are many other ways to improve DFS, and one of them is quickGoal, which means return the path the time trying to add the Goal into fringe, instead of the time popping the Goal out of fringe. In this way, DFS opens 43 blocks, but the maximum fringe size is 42 compared with 43 of common DFS. The path is the same as the one common DFS returned. It is interesting to find quickGoal do not improve DFS much. However, it is because DFS’s fringe is a LIFO queue. In this maze runner, it will not make any difference greater than 3. See Figure \ref{fig:q2-7}. \\
+	
+	Another method is randomWalk. In common DFS, the priority of 4 directions is Left > Down > Right > Up. But randomWalk will randomly pick up a direction between left and down and between right and up. Notice that left and down is still preferable to right and up. Sometimes, it works. For example, in this case, the fringe size is 35, and block count is 33. The path is also shorter than common DFS, which is 33-block length. See Figure \ref{fig:q2-8}. \\
+	
+	Yet it will not be a good idea to totally randomly pick up a direction. Here is the case. Set randomWalkPlue true. It opens 70 blocks. Fringe size goes up to 44. And the path is 53-block length. The reason is that totally random will cause agents go around in a small region, which is contradictory to the idea of DFS. Also, since the Start and the Goal locate at the ends of diagonal, the whole path direction should be southeast. \\
+	
+	Besides, chechFringe itself can also make the path a little bit shorter. Setting checkFringe true returns a path whose length is 39 shorter than common DFS, though it is not the optimal. See Figure \ref{fig:q2-9}. \\
+	
+	Except checkFringe, we can also use distinctFringe to stop duplicated block being pushed into fringe. But once this block is closed, it will never re-open even if we might find a shorter path. In this case, the fringe size, block count and path length is the same as common DFS, but we can see the difference later. See Figure \ref{fig:q2-10}.\\
+	
+	Certainly, we can combine those options, here is an example. Set quickGoal, randomWalk and distinctFringe true. The block count, path length and fringe size are 34, 33 and 31. See Figure \ref{fig:q2-11}.\\
+	
+	The most common BFS opens 113708 blocks, and its fringe size is 27898, because there are lots of duplicated blocks in its fringe. But it returns an optimal path. See Figure \ref{fig:q2-12}.\\
+	
+	To fix this issue, we can use checkFringe. Now it opens only 210 blocks and its fringe size decreases to 16. The path is absolutely optimal. \\
+	
+	Also, Bi-Directional BFS can be helpful, whose fringe size is 2468 compared to 27898 of common BFS. Furthermore, it only opens 3528 blocks. Since it is a variant of BFS, the path must be optimal. When there is no path, Bi-Directional search usually returns faster than common ones because an empty fringe of either side, the Start or the Goal, indicates there is no path. See Figure \ref{fig:q2-13}. \\
+	
+	Now let us examine the performance of quickGoal of BFS. 93752 blocks have been opened, which is much fewer than common BFS. The fringe size also dramatically decreases to 19956. Because the fringe of BFS is a FIFO queue, quickGoal will return the path much earlier. See Figure \ref{fig:q2-14}. \\
+	. 
+	However, randomWalk and randomWalkPlus will not work regarding of BFS. Due to the fact that BFS is searching blocks level by level. The block count, path length, and fringe size of randomWalk is 113708, 31, and 27898. 113707, 31 and 27898 is the same data of randomWalkPlus. See Figure \ref{fig:q2-15} and Figure \ref{fig:q2-16}. \\
+	 
+	Again, we can use many options at the same time. Here is an example. Set BDBFS, quickGoal and randomWalk true. The block count, path length and fringe size becomes 151 31 and 25. See Figure \ref{fig:q2-17}.\\
+	
+	Speaking of A*, there are mainly 3 dimensions to improve it. The heuristic function, Bi-Directional A* and another kind of priority queue. See Figure \ref{fig:q2-18}.\\
+	
+	To begin with, we have chosen 3 distance function to be compared: Euclidean, Manhattan, and Chebyshev. All of them return an optimal path. But the preformation of Manhattan > Euclidean > Chebyshev. The reason is Manhattan is more closed to the real cost than Euclidean and Chebyshev. \\
+	
+	In addition, we can also implement Bi-Directional A*. However, BDA* may not return an optimal path. Because the meet point has shortest path to the Start and Goal, yet the shortest path from the Start to the Goal may not go through the meet point. \\
+	
+	Speaking of priority queue. 2 elements with the same priority can be LIFO or FIFO. The FIFO ones are more common, but we also have tried a LIFO one. LIFO ones preforms much like DFS, especially the maze is nearly empty (no walls). \\
+	
+	All the comparison is recorded in the table. Notice that BDA* LIFO with Manhattan is extraordinary except for non-optimal. \\
 	
 	\begin{figure}
 		\minipage{0.32\textwidth}
-		\includegraphics[width=\linewidth]{../pics/question2-1.png}
-		\caption{A really Awesome Image}\label{fig:awesome_image1}
+		\includegraphics[width=\linewidth]{../pics/16/maze.png}
+		\caption{}\label{fig:maze}
 		\endminipage\hfill
 		\minipage{0.32\textwidth}
-		\includegraphics[width=\linewidth]{../pics/question2-1.png}
-		\caption{A really Awesome Image}\label{fig:awesome_image2}
+		\includegraphics[width=\linewidth]{../pics/16/DFS distinctFringe 43 43 43.png}
+		\caption{}\label{fig:q2-2}
 		\endminipage\hfill
 		\minipage{0.32\textwidth}%
-		\includegraphics[width=\linewidth]{../pics/question2-1.png}
-		\caption{A really Awesome Image}\label{fig:awesome_image3}
+		\includegraphics[width=\linewidth]{../pics/16/DFS IDDFS 2573 33 34.png}
+		\caption{}\label{fig:q2-3}
 		\endminipage
 	\end{figure}
-	
-	TODO \\
+
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS IDDFS checkFringe 8453 31 29.png}
+		\caption{}\label{fig:q2-4}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS keepSearch checkFringe 1118 31 35.png}
+		\caption{}\label{fig:q2-5}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/16/DFS quickGoal 43 43 42.png}
+		\caption{}\label{fig:q2-6}
+		\endminipage
+	\end{figure}
+
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS randomWalk 33 33 35.png}
+		\caption{}\label{fig:q2-7}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS randomWalk Plus 70 53 44.png}
+		\caption{}\label{fig:q2-8}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/16/DFS checkFringe 41 39 35.png}
+		\caption{}\label{fig:q2-9}
+		\endminipage
+	\end{figure}
+
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS distinctFringe 43 43 43.png}
+		\caption{}\label{fig:q2-10}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/DFS quickGoal randomWalk distinctFringe 34 33 31.png}
+		\caption{}\label{fig:q2-11}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/16/BFS randomWalkPlus 113706 31 27898.png}
+		\caption{}\label{fig:q2-12}
+		\endminipage
+	\end{figure}
+
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/BFS BDBFS 3528 31 2468.png}
+		\caption{}\label{fig:q2-13}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/BFS quickGoal 93752 31 19956.png}
+		\caption{}\label{fig:q2-14}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/16/BFS 113708 31 27898.png}
+		\caption{}\label{fig:q2-15}
+		\endminipage
+	\end{figure}
+
+	\begin{figure}
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/BFS randomWalk 113708 31 27898.png}
+		\caption{}\label{fig:q2-16}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}
+		\includegraphics[width=\linewidth]{../pics/16/BFS BDBFS quickGoal randomWalk checkFringe 151 31 23.png}
+		\caption{}\label{fig:q2-17}
+		\endminipage\hfill
+		\minipage{0.32\textwidth}%
+		\includegraphics[width=\linewidth]{../pics/16/Ac 159 31 24.png}
+		\caption{}\label{fig:q2-18}
+		\endminipage
+	\end{figure}
 	
 	
 	\item {For a fixed value of dim as determined in Question (1), for each $ p = 0.1, 0.2, 0.3, ... , 0.9 $, generate a number of maps and try to find a path from start to goal - estimate the probability that a random map has a complete path from start to goal, for each value of $ p $. Plot your data. Note that for $ p $ close to 0, the map is nearly empty and the path is clear; for $ p $ close to 1, the map is mostly filled and there is no clear path. There is some threshhold value $ p_0 $ so that for $ p < p_0 $ , there is usually a clear path, and $ p > p_0 $ there is no path. Estimate $ p_0 $ . Which path finding algorithm is most useful here, and why?} \\
@@ -397,7 +515,7 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
 				\end{itemize}
 			
-				\item {Total number of nodes expanded: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\item {Total number of nodes expanded: See Figure \ref{fig:db1}, Figure \ref{fig:db2} and Figure \ref{fig:db3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
@@ -448,15 +566,15 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 					\minipage{\textwidth}
 					
 					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
-					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\caption{\label{fig:df1}A maze that is hard for DFS in terms of space complexity, whose maximum fringe size is 10032. }
 					
 					\minipage{0.49\textwidth}
 					\includegraphics[width=\textwidth]{../pics/df/10032.png}
-					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\caption{\label{fig:df2}A maze that is hard for DFS in terms of space complexity, whose maximum fringe size is 10032. }
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
 					\includegraphics[width=\textwidth]{../pics/df/10031.png}
-					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\caption{\label{fig:df3} A maze that is hard for DFS in terms of space complexity, whose maximum fringe size is 10031. }
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -578,20 +696,20 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 					\item {The best score we have got is 14776, compared with at most 16384. However, it is really difficult to cancel out those walls by random. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 				
-				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:bf1}, Figure \ref{fig:bf2} and Figure \ref{fig:bf3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
-					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/bf/308.png}
+					\caption{\label{fig:bf1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 308. }
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10032.png}
-					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/bf/307.png}
+					\caption{\label{fig:bf2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 307. }
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10031.png}
-					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\includegraphics[width=\textwidth]{../pics/bf/306.png}
+					\caption{\label{fig:bf3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 306. }
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -603,8 +721,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The time complexity of DFS related to the maximum depth it has searched.}
-					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {The time complexity of BFS related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force BFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of BFS.}
 					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
 				\end{itemize}
 				
@@ -695,11 +813,6 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
 					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for $ A^* $ with Euclidean Distance Heuristic to turn back to search lower left part. }
-					\begin{figure}
-						\centering
-						\includegraphics[width=0.3\textwidth]{../pics/db/hardest.png}
-						\caption{\label{fig:db-hardest} The smallest pathway pattern.}
-					\end{figure}
 					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 				
@@ -709,15 +822,15 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 					\minipage{\textwidth}
 					
 					\includegraphics[width=\textwidth]{../pics/aef/636.png}
-					\caption{\label{fig:aef1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 636. }
+					\caption{\label{fig:aef1}A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of space complexity, whose maximum fringe size is 636. }
 					
 					\minipage{0.49\textwidth}
 					\includegraphics[width=\textwidth]{../pics/aef/634_2.png}
-					\caption{\label{fig:aef2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 634. }
+					\caption{\label{fig:aef2}A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of space complexity, whose maximum fringe size is 634. }
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
 					\includegraphics[width=\textwidth]{../pics/aef/634.png}
-					\caption{\label{fig:aef3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 634. }
+					\caption{\label{fig:aef3} A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of space complexity, whose maximum fringe size is 634. }
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -766,16 +879,6 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
 					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
-					\begin{figure}
-						\minipage{0.6\textwidth}
-						\includegraphics[width=\textwidth]{../pics/dp/pattern.png}
-						\caption{\label{fig:dp-pattern}Two classical patterns of walls: "I" and ">" walls and "J-shape" walls.}
-						\endminipage\hfill
-						\minipage{0.39\textwidth}
-						\includegraphics[width=\textwidth]{../pics/dp/hardest.png}
-						\caption{\label{fig:dp-hardest}}
-						\endminipage
-					\end{figure}
 					
 					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
 				\end{itemize}
