@@ -619,20 +619,20 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 			\item {$ A^* $ with Euclidean Distance Heuristic}
 			\label{A*E} 
 			\begin{enumerate}
-				\item {Length of solution path returned: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\item {Length of solution path returned: See Figure \ref{fig:aep1}, Figure \ref{fig:aep2} and Figure \ref{fig:aep3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/dp/5557.png}
-					\caption{\label{fig:dp1}maze that is hard for DFS in terms of path length, which is 5557.}
+					\includegraphics[width=\textwidth]{../pics/aep/2033.png}
+					\caption{\label{fig:aep1}maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of path length, which is 2033.}
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/dp/5503.png}
-					\caption{\label{fig:dp2}maze that is hard for DFS in terms of path length, which is 5503.}
+					\includegraphics[width=\textwidth]{../pics/aep/1921.png}
+					\caption{\label{fig:aep2}maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of path length, which is 1921.}
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/dp/5495.png}
-					\caption{\label{fig:dp3}maze that is hard for DFS in terms of path length, which is 5495.}
+					\includegraphics[width=\textwidth]{../pics/aep/1909.png}
+					\caption{\label{fig:aep3}maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of path length, which is 1909.}
 					\endminipage
 					\endminipage
 					
@@ -640,16 +640,6 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
 					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
-					\begin{figure}
-						\minipage{0.6\textwidth}
-						\includegraphics[width=\textwidth]{../pics/dp/pattern.png}
-						\caption{\label{fig:dp-pattern}Two classical patterns of walls: "I" and ">" walls and "J-shape" walls.}
-						\endminipage\hfill
-						\minipage{0.39\textwidth}
-						\includegraphics[width=\textwidth]{../pics/dp/hardest.png}
-						\caption{\label{fig:dp-hardest}}
-						\endminipage
-					\end{figure}
 					
 					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
 				\end{itemize}
@@ -668,20 +658,20 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
 				\end{itemize}
 				
-				\item {Total number of nodes expanded: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\item {Total number of nodes expanded: See Figure \ref{fig:aeb1}, Figure \ref{fig:aeb2} and Figure \ref{fig:aeb3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/db/12993.png}
-					\caption{\label{fig:db1}A maze that is hard for DFS in terms of time complexity, which has opend 12993 blocks.}
+					\includegraphics[width=\textwidth]{../pics/aeb/14586.png}
+					\caption{\label{fig:aeb1}A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of time complexity, which has opend 14586 blocks.}
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/db/12968.png}
-					\caption{\label{fig:db2}A maze that is hard for DFS in terms of time complexity, which has opend 12968 blocks.}
+					\includegraphics[width=\textwidth]{../pics/aeb/14582.png}
+					\caption{\label{fig:aeb2}A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of time complexity, which has opend 14582 blocks.}
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/db/12967.png}
-					\caption{\label{fig:db3} A maze that is hard for DFS in terms of time complexity, which has opend 12967 blocks.}
+					\includegraphics[width=\textwidth]{../pics/aeb/14581.png}
+					\caption{\label{fig:aeb3} A maze that is hard for $ A^* $ with Euclidean Distance Heuristic in terms of time complexity, which has opend 14581 blocks.}
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -696,15 +686,15 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\textbf{Reasons:} 
 				\begin{itemize}
 					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {The pathway opens to left rather than up makes DFS cannot first run right to the last column and then find the pathway. It takes time for DFS to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
-					\item {After DFS reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for DFS to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
-					\item {Therefore, DFS nearly searched all the blocks to reach the Goal.}
-					\item {Notice that if randomWalk == True, this pattern will not always work because DFS may go down first rather than right.}
+					\item {The pathway opens to left rather than up makes $ A^* $ with Euclidean Distance Heuristic cannot first run right to the last column and then find the pathway. It takes time for $ A^* $ with Euclidean Distance Heuristic to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
+					\item {After $ A^* $ with Euclidean Distance Heuristic reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for $ A^* $ with Euclidean Distance Heuristic to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
+					\item {Therefore, $ A^* $ with Euclidean Distance Heuristic nearly searched all the blocks to reach the Goal.}
+					\item {Notice that if randomWalk == True, this pattern will not always work because $ A^* $ with Euclidean Distance Heuristic may go down first rather than right.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for DFS to turn back to search lower left part. }
+					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for $ A^* $ with Euclidean Distance Heuristic to turn back to search lower left part. }
 					\begin{figure}
 						\centering
 						\includegraphics[width=0.3\textwidth]{../pics/db/hardest.png}
@@ -714,20 +704,20 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\end{itemize}
 				
 				
-				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:aef1}, Figure \ref{fig:aef2} and Figure \ref{fig:aef3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
-					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/aef/636.png}
+					\caption{\label{fig:aef1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 636. }
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10032.png}
-					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/aef/634_2.png}
+					\caption{\label{fig:aef2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 634. }
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10031.png}
-					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\includegraphics[width=\textwidth]{../pics/aef/634.png}
+					\caption{\label{fig:aef3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 634. }
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -739,8 +729,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The time complexity of DFS related to the maximum depth it has searched.}
-					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {The time complexity of $ A^* $ with Euclidean Distance Heuristic related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force $ A^* $ with Euclidean Distance Heuristic to search lower left part rather than immediately reach the Goal, which increased the maximum depth of $ A^* $ with Euclidean Distance Heuristic.}
 					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
 				\end{itemize}
 				
@@ -755,20 +745,20 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 			\item {$ A^* $ with Manhattan Distance Heuristic} 
 			\label{A*M}
 			\begin{enumerate}
-				\item {Length of solution path returned: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\item {Length of solution path returned: See Figure \ref{fig:amp1}, Figure \ref{fig:amp2} and Figure \ref{fig:amp3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/dp/5557.png}
-					\caption{\label{fig:dp1}maze that is hard for DFS in terms of path length, which is 5557.}
+					\includegraphics[width=\textwidth]{../pics/amp/2171.png}
+					\caption{\label{fig:amp1}maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of path length, which is 2171.}
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/dp/5503.png}
-					\caption{\label{fig:dp2}maze that is hard for DFS in terms of path length, which is 5503.}
+					\includegraphics[width=\textwidth]{../pics/amp/2167.png}
+					\caption{\label{fig:amp2}maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of path length, which is 2167.}
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/dp/5495.png}
-					\caption{\label{fig:dp3}maze that is hard for DFS in terms of path length, which is 5495.}
+					\includegraphics[width=\textwidth]{../pics/amp/2137.png}
+					\caption{\label{fig:amp3}maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of path length, which is 2137.}
 					\endminipage
 					\endminipage
 					
@@ -808,16 +798,16 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/db/12993.png}
-					\caption{\label{fig:db1}A maze that is hard for DFS in terms of time complexity, which has opend 12993 blocks.}
+					\includegraphics[width=\textwidth]{../pics/amb/14210.png}
+					\caption{\label{fig:amb1}A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of time complexity, which has opend 14210 blocks.}
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/db/12968.png}
-					\caption{\label{fig:db2}A maze that is hard for DFS in terms of time complexity, which has opend 12968 blocks.}
+					\includegraphics[width=\textwidth]{../pics/amb/14209.png}
+					\caption{\label{fig:amb2}A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of time complexity, which has opend 14209 blocks.}
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/db/12967.png}
-					\caption{\label{fig:db3} A maze that is hard for DFS in terms of time complexity, which has opend 12967 blocks.}
+					\includegraphics[width=\textwidth]{../pics/amb/14205.png}
+					\caption{\label{fig:amb3} A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of time complexity, which has opend 14205 blocks.}
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -832,38 +822,32 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\textbf{Reasons:} 
 				\begin{itemize}
 					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {The pathway opens to left rather than up makes DFS cannot first run right to the last column and then find the pathway. It takes time for DFS to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
-					\item {After DFS reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for DFS to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
-					\item {Therefore, DFS nearly searched all the blocks to reach the Goal.}
-					\item {Notice that if randomWalk == True, this pattern will not always work because DFS may go down first rather than right.}
+					\item {The pathway opens to left rather than up makes $ A^* $ with Manhattan Distance Heuristic cannot first run right to the last column and then find the pathway. It takes time for $ A^* $ with Manhattan Distance Heuristic to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
+					\item {After $ A^* $ with Manhattan Distance Heuristic reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for $ A^* $ with Manhattan Distance Heuristic to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
+					\item {Therefore, $ A^* $ with Manhattan Distance Heuristic nearly searched all the blocks to reach the Goal.}
+					\item {Notice that if randomWalk == True, this pattern will not always work because $ A^* $ with Manhattan Distance Heuristic may go down first rather than right.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for DFS to turn back to search lower left part. }
-					\begin{figure}
-						\centering
-						\includegraphics[width=0.3\textwidth]{../pics/db/hardest.png}
-						\caption{\label{fig:db-hardest} The smallest pathway pattern.}
-					\end{figure}
 					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
 				\end{itemize}
 				
 				
-				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:amf1}, Figure \ref{fig:amf2} and Figure \ref{fig:amf3}.} \\
 				\begin{figure}
 					\minipage{\textwidth}
 					
-					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
-					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/amf/9720.png}
+					\caption{\label{fig:amf1}A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of space complexity, whose maximum fringe size is 9720. }
 					
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10032.png}
-					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\includegraphics[width=\textwidth]{../pics/amf/9716.png}
+					\caption{\label{fig:amf2}A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of space complexity, whose maximum fringe size is 9716. }
 					\endminipage\hfill
 					\minipage{0.49\textwidth}
-					\includegraphics[width=\textwidth]{../pics/df/10031.png}
-					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\includegraphics[width=\textwidth]{../pics/amf/9696.png}
+					\caption{\label{fig:amf3} A maze that is hard for $ A^* $ with Manhattan Distance Heuristic in terms of space complexity, whose maximum fringe size is 9696. }
 					\endminipage
 					\endminipage 
 				\end{figure}
@@ -875,8 +859,8 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The time complexity of DFS related to the maximum depth it has searched.}
-					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {The time complexity of $ A^* $ with Manhattan Distance Heuristic related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force $ A^* $ with Manhattan Distance Heuristic to search lower left part rather than immediately reach the Goal, which increased the maximum depth of $ A^* $ with Manhattan Distance Heuristic.}
 					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
 				\end{itemize}
 				
