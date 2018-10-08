@@ -414,7 +414,18 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 			\end{enumerate} 
 		
 			\textbf{Genetic Algorithm:} \\
-			TODO \\
+			\begin{enumerate}
+				\item {In one iteration, 60\% of population are selected to reproduce, 10\% of population are selected to be "survive". }
+				\item {The probability of one individual has the chance to reproduce is $ \frac{Fitness-of-individual}{Total-fitness-of-the-popualtion} $}
+				\item {There are 3 types of reproduction. }
+				\begin{itemize}
+					\item {Type 1: Randomly choose a number n in [1:size], a child consists of his father's left $ size \times n$ matrix and his mother's $ size \times size - n$ matrix}
+					\item {Type 2: Randomly choose a number n in [1:size], a child consists of his father's left $ n \times size$ matrix and his mother's $ size - n \times size$ matrix}
+					\item {Type 3: Randomly choose a number n in [1:size], a child consists of his father's upper-left triangle matrix and his mother's bottom-left triangle matrix}
+				\end{itemize}
+				\item {There is 10\% chance that a child will mutate genetically. When mutate happens, a random number(At most $ n^2 - 2$, applies to the normal distribution) of nodes will be changed to its opposite.}
+				\item {Generally, we run Genetic Algorithm of the population size between 800 and 1400, max iterations of 140.}
+			\end{enumerate}
 			
 			\textbf{Beam Annealing:} \\
 			\begin{enumerate}
@@ -435,7 +446,7 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 		\item {Unlike the problem of solving a maze, for which the ‘goal’ is well-defined, it is difficult to know when we have constructed the ‘hardest’ maze. That being so, what kind of termination conditions can you apply to your search algorithm to generate ‘hard’ if not the ‘hardest’ mazes? What kind of shortcomings or advantages do you anticipate your approach having?} \\
 		
 		\textbf{Genetic Algorithm:} \\
-		TODO\\
+		We are just using 1 method to halt the iteration. We have run Genetic Algorithm of more than 1000 iterations, and it was just becoming less significant. We still could see the output improving once many iterations. So we decided to halt the Genetic Algorithm after it reach the max iteration number(typically ~140) and use Beam search to finetune the results.
 		
 		\textbf{Beam Annealing:} \\
 		There are 3 different ways to halt the iteration: \\
@@ -716,21 +727,30 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+					\item {The lower right part is nearly empty, but the upper left part is massive.}
+					\item {There are only a limited number of exits of the upper left part. Usually only 2 exits or 1 exit.}
+					\item {The path length to exits is nearly equal.}
+					\item {Actually, blocks far from these exits tend to be empty, even if it belongs to upper left part. See Figure \ref{fig:bf-pattern}.}
 				\end{itemize}
+				
+				\begin{figure}
+					\centering
+					\includegraphics[width=\textwidth]{../pics/bf/pattern.png}
+					\caption{\label{fig:bf-pattern} Comparison of average number of nodes expanded.}
+				\end{figure}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The time complexity of BFS related to the maximum depth it has searched.}
-					\item {Hence, a "door sill" pattern can force BFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of BFS.}
-					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
+					\item {BFS always search blocks level by level, therefore the fringe shape looks like a part of a circle.}
+					\item {To maximize the fringe size is to try to find a circle in the maze as large as possible.}
+					\item {The largest circle in a square is its incircle. But it is hard to randomly build walls to line up along the diagonal. Hence the case of 2 smaller circles is more common.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {The same maze as Question 10.b.ii.}
-					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
-					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+					\item {The maximum fringe size can be $Perimeter_{incercle} - WallCost \approx \sqrt2 \pi *size - WallCost \approx 560$.}
+					\item {Compared with 560, 308 may not be "hardest" maze. But it is really impossible to randomly set walls to line up along the diagonal.}
+					\item {Compared with a totally empty maze whose fringe size is 253, which was thought to be the "hardest" maze. 305 could be called a "harder" maze.}
 				\end{itemize}
 			\end{enumerate}
 			
@@ -757,23 +777,18 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\end{figure}
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
-					
-					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+					\item {The same as "hardest" mazes of BFS in terms of path length. }
 				\end{itemize}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The key point is when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {"I" and ">" walls lead agent walk horizontally, and the path it has walked becomes "new wall" because those blocks have been added into the closed set. Now it becomes a "J-shape" walls in the mirror.}
-					\item {"J- shape" walls force agents search all blocks inside because agents prefer to go right or left than to move up.}
+					\item {Both A* and BFS return an optimal path. To lengthen the A*'s path, is to lengthen BFS's path.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {The ideal "J-shape" walls can be maze-sized. (See Fig \ref{fig:dp-hardest}) In this case, the path length can be $size \times size - WallCost = 16312$. Notice that if size is an odd number, not all the accessible blocks are in the path. Specifically, only the first 3 blocks in the 2nd row are in the path. }
-					\item {Compared with 16312, 5557 is not a big number. However, it is extremely impossible to randomly set all walls in a line.}
-					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
+					\item {There are 2 kinds of the "hardest" maze: “Gluttonous-Snake-like” mazes and Hilbert-curve-like mazes. Both of them can let the path length reached $\frac{size * size}{2} = 8192$,  where the 2 is the cost of building walls to limit the path.}
+					\item {Compared with 8192, 2033 is not "hard" enough. It is also presented in Fig 2.10.5 that there are still many blocks totally unused. However, due to the time limitation, we cannot run the iterations more times. Yet, 2033 compared with 500 in Question 4(Notice that the size of mazes in Question 4 is 200, which is larger than 128.) can be regarded as a "harder" maze.}
 				\end{itemize}
 				
 				\item {Total number of nodes expanded: See Figure \ref{fig:aeb1}, Figure \ref{fig:aeb2} and Figure \ref{fig:aeb3}.} \\
@@ -878,23 +893,18 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\end{figure}
 				\textbf{Patterns or trends:} 
 				\begin{itemize}
-					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
-					
-					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+					\item {The same as "hardest" mazes of BFS in terms of path length.}
 				\end{itemize}
 				
 				\textbf{Reasons:} 
 				\begin{itemize}
-					\item {The key point is when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
-					\item {"I" and ">" walls lead agent walk horizontally, and the path it has walked becomes "new wall" because those blocks have been added into the closed set. Now it becomes a "J-shape" walls in the mirror.}
-					\item {"J- shape" walls force agents search all blocks inside because agents prefer to go right or left than to move up.}
+					\item {Both A* and BFS return an optimal path. To lengthen the A*'s path, is to lengthen BFS's path.}
 				\end{itemize}
 				
 				\textbf{"The hardest" maze:} 
 				\begin{itemize}
-					\item {The ideal "J-shape" walls can be maze-sized. (See Fig \ref{fig:dp-hardest}) In this case, the path length can be $size \times size - WallCost = 16312$. Notice that if size is an odd number, not all the accessible blocks are in the path. Specifically, only the first 3 blocks in the 2nd row are in the path. }
-					\item {Compared with 16312, 5557 is not a big number. However, it is extremely impossible to randomly set all walls in a line.}
-					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
+					\item {There are 2 kinds of the "hardest" maze: “Gluttonous-Snake-like” mazes and Hilbert-curve-like mazes. Both of them can let the path length reached $\frac{size * size}{2} = 8192$,  where the 2 is the cost of building walls to limit the path.}
+					\item {Compared with 8192, 2171 is not "hard" enough. It is also presented in Fig 2.10.5 that there are still many blocks totally unused. However, due to the time limitation, we cannot run the iterations more times. Yet, 2171 compared with 500 in Question 4(Notice that the size of mazes in Question 4 is 200, which is larger than 128.) can be regarded as a "harder" maze.}
 				\end{itemize}
 				
 				\item {Total number of nodes expanded: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
