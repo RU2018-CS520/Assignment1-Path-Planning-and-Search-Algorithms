@@ -67,12 +67,12 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 	#INPUT ARGS: #further reading: description.md
 	#class maze m: maze to be solved
 	#bool IDDFS: True: Iterative Deepening Depth First Search; False: DFS
-	#bool keepSearch incompatible with quickGoal: True: not return until empty fringe; False: return as soon as goal, usually faster 
+	#bool keepSearch incompatible with quickGoal, distinctFringe: True: not return until empty fringe; False: return as soon as goal, usually faster 
 	#bool quickGoal incompatible with keepSearch: True: immediately return when push goal into fringe; False: return when pop goal out from fringe
 	#bool randomWalk: True: priority: R and D > L and U; False: priority: strictly R > D > L > U
 	#bool randomWalkPlus: True: totally random, no priority; False: depend on randomWalk
-	#bool distinctFringe imcompatible with checkFringe: True: keep fringe distinct, and closed block will be always closed; False: just keep no back turning, but can visit a block twice
-	#bool checkFringe imcompatible with checkFringe: True: keep fringe distinct and best; False: just keep no back turning, but can visit a block twice
+	#bool distinctFringe imcompatible with checkFringe, keepSearch: True: keep fringe distinct, and closed block will be always closed; False: just keep no back turning, but can visit a block twice
+	#bool checkFringe imcompatible with distinctFringe: True: keep fringe distinct and best; False: just keep no back turning, but can visit a block twice
 	#bool plotClosed: True: pass closed set to maze for ploting; False: discard closed set
 	#RETURN VALUE:
 	#int blockCount in [1 : inf]: the number of blocks have opend
@@ -166,6 +166,10 @@ def DFS(m, IDDFS = False, keepSearch = False, quickGoal = False, randomWalk = Fa
 		return (blockCount, goalPath, maxFirngeSize)
 
 	#check input
+	if keepSearch and distinctFringe:
+		print('W: DFS(), contradictory input args DISTINCTFRINGE and KEEPSEARCH')
+		keepSearch = checkFringe
+		distinctFringe = False
 	if distinctFringe and checkFringe:
 		print('W: DFS(), contradictory input args DISTINCTFRINGE and CHECKFRINGE')
 		distinctFringe = False
