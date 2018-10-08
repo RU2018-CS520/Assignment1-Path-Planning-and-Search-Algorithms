@@ -19,6 +19,7 @@
 \setlist[bonus, 1]{label = Bonus \arabic*}
 
 
+
 % Adjust margins
 \addtolength{\oddsidemargin}{-0.375in}
 \addtolength{\evensidemargin}{-0.375in}
@@ -344,6 +345,7 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 		\item {For each of the following algorithms, do the following: Using your local search algorithm, for each of the following properties indicated, generate and present three mazes that attempt to maximize the indicated property. Do you see any patterns or trends? How can you account for them? What can you hypothesize about the ‘hardest’ maze, and how close do you think you got to it?}
 		\begin{enumerate}
 			\item {DFS} \\
+			\label{DFS}
 			The configuration of DFS is set to 'quickGoal' : True, 'distinctFringe' : True, and all others are False.
 			\begin{enumerate}
 				\item {Length of solution path returned: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
@@ -479,25 +481,411 @@ In this group project, apart from implementing DFS, BFS, $ A^* $ with Euclidean 
 				\end{itemize}
 			\end{enumerate}
 		
-			\item {BFS} 
+			\item {BFS} \\
+			\label{BFS}
+			The configuration of BFS is set to 'quickGoal' : True, 'checkFringe' : True, and all others are False. \\
 			\begin{enumerate}
-				\item {Length of solution path returned} 
-				\item {Total number of nodes expanded} 
-				\item {Maximum size of fringe during runtime}
+				\item {Length of solution path returned: See Figure \ref{fig:bp1}, Figure \ref{fig:bp2} and Figure \ref{fig:bp3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/bp/2117.png}
+					\caption{\label{fig:bp1}maze that is hard for BFS in terms of path length, which is 2117.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/bp/2093.png}
+					\caption{\label{fig:bp2}maze that is hard for BFS in terms of path length, which is 2093.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/bp/2091.png}
+					\caption{\label{fig:bp3}maze that is hard for BFS in terms of path length, which is 2091.}
+					\endminipage
+					\endminipage
+					
+				\end{figure}
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The path looks like a Hilbert curve, and as time goes, the path gets more and more sinuous.}
+					\item {Walls are closely next to the path.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {It is true that the path can also look like a “Gluttonous Snake”, which goes down to the bottom, walk right for 2 blocks, goes up to the top, walk right for 2 blocks, and repeat. However, it is hard to generate walls lined up just by random, so a Hilbert-curve-like maze is more probable.}
+					\item {Hilbert curve can theoretically reach every point of a plane, i.e., its length can be the maximum.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {There are 2 kinds of the "hardest" maze: “Gluttonous-Snake-like” mazes and Hilbert-curve-like mazes. Both of them can let the path length reached $\frac{size * size}{2} = 8192$, where the 2 is the cost of building walls to limit the path.}
+					\item {Compared with 8192, 2117 is not "hard" enough. It is also presented in Fig 2.10.5 that there are still many blocks totally unused. However, due to the time limitation, we cannot run the iterations more times. Yet, 2117 compared with 500 in Question 4(Notice that the size of mazes in Question 4 is 200, which is larger than 128.) can be regarded as a "harder" maze.}
+					\item {Also, it is interesting to take the maximum fringe size into account. The ideal "hardest" maze's fringe size can be always 1 because there is only one path whose width is also 1 to reach the Goal. Hence, the maximum fringe size can also measure how close we get to the "hardest" maze. But notice that not all mazes whose max fringe size is 1 are "hardest" maze, due to the fact that the path can directly go diagonally. Table \ref{Table 2} shows the fringe size and path length of top 5 "harder" mazes we have generated.}
+					\begin{center}
+						\label{Table 2}
+						\begin{tabular}{|c|c|c|}
+							\hline
+							Block & Path & Fringe \\
+							\hline
+							7013 & 2117 & 14 \\
+							\hline
+							7467 & 2093 & 18 \\
+							\hline
+							7293 & 2091 & 18 \\
+							\hline
+							7382 & 2069 & 27 \\
+							\hline
+							7433 & 2069 & 26 \\
+							\hline
+						\end{tabular}
+						\captionof{table}{}
+					\end{center}
+				\end{itemize}
+				
+				\item {Total number of nodes expanded: See Figure \ref{fig:bb1}, Figure \ref{fig:bb2} and Figure \ref{fig:bb3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/bb/14776.png}
+					\caption{\label{fig:bb1}A maze that is hard for BFS in terms of time complexity, which has opend 14776 blocks.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/bb/14772_2.png}
+					\caption{\label{fig:bb2}A maze that is hard for BFS in terms of time complexity, which has opend 14772 blocks.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/bb/14772.png}
+					\caption{\label{fig:bb3} A maze that is hard for BFS in terms of time complexity, which has opend 14772 blocks.}
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {A nearly "empty"(no walls) maze is usually hard for BFS in terms of time complexity.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {BFS will open shallower blocks first, and then move to deeper blocks.}
+					\item {Usually, the Goal is the deepest block if the Start is located at 2 ends of a diagonal.}
+					\item {In this case, BFS will open all the accessible blocks before reaching the Goal. The number of blocks opened is exactly the number of all accessible blocks of this maze.}
+					\item {To make it harder is to make more blocks accessible. Namely, to delete more walls.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {A totally "empty" maze whose number of blocks opened is exactly $size \times size = 16384$.}
+					\item {The best score we have got is 14776, compared with at most 16384. However, it is really difficult to cancel out those walls by random. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
+				
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
+					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10032.png}
+					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10031.png}
+					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {The time complexity of DFS related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {The same maze as Question 10.b.ii.}
+					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
+					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
 			\end{enumerate}
 			
-			\item {$ A^* $ with Euclidean Distance Heuristic} 
+			\item {$ A^* $ with Euclidean Distance Heuristic}
+			\label{A*E} 
 			\begin{enumerate}
-				\item {Length of solution path returned} 
-				\item {Total number of nodes expanded} 
-				\item {Maximum size of fringe during runtime}
+				\item {Length of solution path returned: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/dp/5557.png}
+					\caption{\label{fig:dp1}maze that is hard for DFS in terms of path length, which is 5557.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/dp/5503.png}
+					\caption{\label{fig:dp2}maze that is hard for DFS in terms of path length, which is 5503.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/dp/5495.png}
+					\caption{\label{fig:dp3}maze that is hard for DFS in terms of path length, which is 5495.}
+					\endminipage
+					\endminipage
+					
+				\end{figure}
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
+					\begin{figure}
+						\minipage{0.6\textwidth}
+						\includegraphics[width=\textwidth]{../pics/dp/pattern.png}
+						\caption{\label{fig:dp-pattern}Two classical patterns of walls: "I" and ">" walls and "J-shape" walls.}
+						\endminipage\hfill
+						\minipage{0.39\textwidth}
+						\includegraphics[width=\textwidth]{../pics/dp/hardest.png}
+						\caption{\label{fig:dp-hardest}}
+						\endminipage
+					\end{figure}
+					
+					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {The key point is when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
+					\item {"I" and ">" walls lead agent walk horizontally, and the path it has walked becomes "new wall" because those blocks have been added into the closed set. Now it becomes a "J-shape" walls in the mirror.}
+					\item {"J- shape" walls force agents search all blocks inside because agents prefer to go right or left than to move up.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {The ideal "J-shape" walls can be maze-sized. (See Fig \ref{fig:dp-hardest}) In this case, the path length can be $size \times size - WallCost = 16312$. Notice that if size is an odd number, not all the accessible blocks are in the path. Specifically, only the first 3 blocks in the 2nd row are in the path. }
+					\item {Compared with 16312, 5557 is not a big number. However, it is extremely impossible to randomly set all walls in a line.}
+					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
+				\end{itemize}
+				
+				\item {Total number of nodes expanded: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/db/12993.png}
+					\caption{\label{fig:db1}A maze that is hard for DFS in terms of time complexity, which has opend 12993 blocks.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/db/12968.png}
+					\caption{\label{fig:db2}A maze that is hard for DFS in terms of time complexity, which has opend 12968 blocks.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/db/12967.png}
+					\caption{\label{fig:db3} A maze that is hard for DFS in terms of time complexity, which has opend 12967 blocks.}
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The pathway near the Goal(10 * 10 blocks in the lower right corner) is extremely narrow(only 1 block width), opens to left, and begins with a "door sill" wall that forces the path to move up a block.}
+					
+					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
+					\item {The pathway opens to left rather than up makes DFS cannot first run right to the last column and then find the pathway. It takes time for DFS to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
+					\item {After DFS reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for DFS to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
+					\item {Therefore, DFS nearly searched all the blocks to reach the Goal.}
+					\item {Notice that if randomWalk == True, this pattern will not always work because DFS may go down first rather than right.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for DFS to turn back to search lower left part. }
+					\begin{figure}
+						\centering
+						\includegraphics[width=0.3\textwidth]{../pics/db/hardest.png}
+						\caption{\label{fig:db-hardest} The smallest pathway pattern.}
+					\end{figure}
+					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
+				
+				
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
+					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10032.png}
+					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10031.png}
+					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {The time complexity of DFS related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {The same maze as Question 10.b.ii.}
+					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
+					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
 			\end{enumerate}
 			
 			\item {$ A^* $ with Manhattan Distance Heuristic} 
+			\label{A*M}
 			\begin{enumerate}
-				\item {Length of solution path returned} 
-				\item {Total number of nodes expanded} 
-				\item {Maximum size of fringe during runtime}
+				\item {Length of solution path returned: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/dp/5557.png}
+					\caption{\label{fig:dp1}maze that is hard for DFS in terms of path length, which is 5557.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/dp/5503.png}
+					\caption{\label{fig:dp2}maze that is hard for DFS in terms of path length, which is 5503.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/dp/5495.png}
+					\caption{\label{fig:dp3}maze that is hard for DFS in terms of path length, which is 5495.}
+					\endminipage
+					\endminipage
+					
+				\end{figure}
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {There are 2 classical patterns of walls. (See Figure \ref{fig:dp-pattern}) In one case, walls lead agents to go down some rows, then there usually several nearly "empty"(no walls) rows to move horizontally. But at the end of these rows, diagonal walls lead agents to move up. This case looks like "I" and ">". The other case is "J-shape" walls. }
+					\begin{figure}
+						\minipage{0.6\textwidth}
+						\includegraphics[width=\textwidth]{../pics/dp/pattern.png}
+						\caption{\label{fig:dp-pattern}Two classical patterns of walls: "I" and ">" walls and "J-shape" walls.}
+						\endminipage\hfill
+						\minipage{0.39\textwidth}
+						\includegraphics[width=\textwidth]{../pics/dp/hardest.png}
+						\caption{\label{fig:dp-hardest}}
+						\endminipage
+					\end{figure}
+					
+					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {The key point is when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
+					\item {"I" and ">" walls lead agent walk horizontally, and the path it has walked becomes "new wall" because those blocks have been added into the closed set. Now it becomes a "J-shape" walls in the mirror.}
+					\item {"J- shape" walls force agents search all blocks inside because agents prefer to go right or left than to move up.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {The ideal "J-shape" walls can be maze-sized. (See Fig \ref{fig:dp-hardest}) In this case, the path length can be $size \times size - WallCost = 16312$. Notice that if size is an odd number, not all the accessible blocks are in the path. Specifically, only the first 3 blocks in the 2nd row are in the path. }
+					\item {Compared with 16312, 5557 is not a big number. However, it is extremely impossible to randomly set all walls in a line.}
+					\item {However, compared with less than 1000 block length in a 200 by 200 maze(from Question 5), 5557 in a 128 by 128 maze can be regarded as a "harder" maze, though it is not the "hardest" maze.}
+				\end{itemize}
+				
+				\item {Total number of nodes expanded: See Figure \ref{fig:dp1}, Figure \ref{fig:dp2} and Figure \ref{fig:dp3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/db/12993.png}
+					\caption{\label{fig:db1}A maze that is hard for DFS in terms of time complexity, which has opend 12993 blocks.}
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/db/12968.png}
+					\caption{\label{fig:db2}A maze that is hard for DFS in terms of time complexity, which has opend 12968 blocks.}
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/db/12967.png}
+					\caption{\label{fig:db3} A maze that is hard for DFS in terms of time complexity, which has opend 12967 blocks.}
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The pathway near the Goal(10 * 10 blocks in the lower right corner) is extremely narrow(only 1 block width), opens to left, and begins with a "door sill" wall that forces the path to move up a block.}
+					
+					\item {"I" and ">" walls and "J-shape" walls appear alternately.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {Notice that when randomWalk == False, the priority of 4 directions is Right > Down > Left > Up.}
+					\item {The pathway opens to left rather than up makes DFS cannot first run right to the last column and then find the pathway. It takes time for DFS to search all upper right part(above the path) and then realize "Oops, there is no way to the goal. I have to backtrack."}
+					\item {After DFS reached the "door sill", it prefers to go to any directions but up. Hence, it takes more time for DFS to search all lower left part(below the path) and then realize "Alright, I will go up to see if there is a path."}
+					\item {Therefore, DFS nearly searched all the blocks to reach the Goal.}
+					\item {Notice that if randomWalk == True, this pattern will not always work because DFS may go down first rather than right.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {A maze is "empty"(no walls) except the lower right corner. The lower right corner should be a pathway like this pattern. The smallest pattern can be done in 4 * 4.(See Fig \ref{fig:db-hardest}). Notice there must be at least 2 block height "door sill" for DFS to turn back to search lower left part. }
+					\begin{figure}
+						\centering
+						\includegraphics[width=0.3\textwidth]{../pics/db/hardest.png}
+						\caption{\label{fig:db-hardest} The smallest pathway pattern.}
+					\end{figure}
+					\item {Compare to $size \times size - WallCost =16377$, 12993 can still be improved. However, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
+				
+				
+				\item {Maximum size of fringe during runtime: See Figure \ref{fig:df1}, Figure \ref{fig:df2} and Figure \ref{fig:df3}.} \\
+				\begin{figure}
+					\minipage{\textwidth}
+					
+					\includegraphics[width=\textwidth]{../pics/df/10032_2.png}
+					\caption{\label{fig:df1}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10032.png}
+					\caption{\label{fig:df2}A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10032. }
+					\endminipage\hfill
+					\minipage{0.49\textwidth}
+					\includegraphics[width=\textwidth]{../pics/df/10031.png}
+					\caption{\label{fig:df3} A maze that is hard for BFS in terms of space complexity, whose maximum fringe size is 10031. }
+					\endminipage
+					\endminipage 
+				\end{figure}
+				
+				\textbf{Patterns or trends:} 
+				\begin{itemize}
+					\item {The same pattern as Question 10.b.ii, but there should be a clear path along the first row and upper half of the last column.}
+				\end{itemize}
+				
+				\textbf{Reasons:} 
+				\begin{itemize}
+					\item {The time complexity of DFS related to the maximum depth it has searched.}
+					\item {Hence, a "door sill" pattern can force DFS to search lower left part rather than immediately reach the Goal, which increased the maximum depth of DFS.}
+					\item {A larger lower left part increases the depth, so the upper right part should be as small as possible.}
+				\end{itemize}
+				
+				\textbf{"The hardest" maze:} 
+				\begin{itemize}
+					\item {The same maze as Question 10.b.ii.}
+					\item {The maximum fringe size is theoretically $(size-1)^2-WallCost = 16113$, compared with 10032. Noticed distinctFringe actually do not promise all elements in the fringe are distinct because it takes too much time to search in a stack frequently. (Further information is available in description.md)}
+					\item {Again, it is really difficult to cancel out those outside walls by random without destroying the pattern. Therefore, it has been a nearly "hardest" maze.}
+				\end{itemize}
 			\end{enumerate}
 		\end{enumerate}
 	\end{enumerate}
